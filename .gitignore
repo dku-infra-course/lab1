@@ -1,0 +1,43 @@
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+.terraform/
+.terraform.lock.hcl
+crash.log
+
+# 자격증명 / 비밀값 (절대 커밋하지 않는다)
+.env
+.env.*
+*.pem
+*.key
+*.p12
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+known_hosts
+secrets.yml
+secrets.yaml
+
+# 학생별 환경값을 채운 사본
+*.local
+*.local.conf
+env.sh
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# 로그 / 임시
+*.log
+*.bak
+*.tmp
+bench-result-*.txt
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,55 @@
+# week05 · Squid 포워드 프록시 캐시 설정 조각
+#
+# cache_dir 줄은 /etc/squid/squid.conf 맨 아래에 추가해도 된다(순서 무관).
+#
+#   cache_dir ufs /var/spool/squid 100 16 256
+#     ufs                  저장 방식
+#     /var/spool/squid     캐시 경로
+#     100                  최대 크기 (MB)
+#     16                   1단계 하위 디렉터리 수
+#     256                  2단계 하위 디렉터리 수
+cache_dir ufs /var/spool/squid 100 16 256
+
+# ---------------------------------------------------------------
+# 주의: http_access 줄은 "맨 아래에 추가"하면 안 된다.
+#
+# Squid 기본 설정 파일에는 http_port 3128 과 localnet 을 가리키는 acl 정의가
+# 이미 들어 있지만, 그 acl 을 실제로 허용하는 http_access 줄은 기본적으로
+# 주석 처리되어 있다(2026-08-27 확인). 파일 안에서 아래와 비슷한 줄을 찾아
+# 주석(#)만 지운다. 파일 맨 아래에 새로 추가하면 그보다 앞에 있는
+# "http_access deny all"에 먼저 걸려 아무 효과가 없다.
+#
+#   # http_access allow localnet     <- 이 줄의 주석을 지운다
+#   http_access allow localhost
+#
+# 이 줄이 없으면 캐시 서버 VM 자기 자신(localhost)만 프록시를 쓸 수 있고,
+# 다른 VM이나 내 노트북에서 --proxy로 붙으면 403(TCP_DENIED)이 난다.
+# ---------------------------------------------------------------
+
+# ---------------------------------------------------------------
+# 적용 순서
+#
+#   sudo systemctl stop squid
+#   sudo rm -rf /var/spool/squid/*
+#   sudo squid -z
+#   sleep 3
+#   sudo systemctl start squid
+#   sudo systemctl status squid
+#
+# 확인(2026-08-27): 이 배포판의 squid 서비스는 ExecStartPre 로 시작할 때마다
+# squid -z 를 자동으로 실행한다. 그래서 stop 이 끝나기 전에 수동으로 squid -z
+# 를 실행하면 "FATAL: Squid is already running" 오류가 날 수 있다. stop이
+# 완전히 끝난 뒤(systemctl is-active squid 가 inactive로 뜬 뒤) 실행하거나,
+# squid -z 줄을 건너뛰고 stop 다음 바로 start 해도 결과는 같다.
+#
+# 확인
+#   time curl --proxy http://localhost:3128 http://{{WEBSERVER_IP}}:5000/api/products
+#   sudo cat /var/log/squid/access.log
+#     첫 요청  TCP_MISS/200
+#     재요청   TCP_MEM_HIT/200 또는 TCP_HIT/200
+#
+# 주의: Squid가 응답을 캐시하려면 백엔드 응답에 캐싱 가능한 Cache-Control이
+# 있어야 한다. app.py의 /api/products는 이 헤더('public, max-age=10')를
+# 보낸다(2026-08-27 재확인: 이 헤더가 없으면 매 요청 TCP_REFRESH_MODIFIED로
+# 재검증만 하고 실제로는 캐시되지 않는다).
+# ---------------------------------------------------------------

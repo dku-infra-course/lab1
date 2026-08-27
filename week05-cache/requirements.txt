@@ -1,0 +1,15 @@
+# week05 · Flask 백엔드 앱 의존성
+#
+# 실습 가이드는 apt 로 설치한다(권장). 배포판 저장소 버전을 그대로 쓴다.
+#   sudo apt install python3-flask python3-redis -y
+#
+# 가상 환경에서 pip 로 설치하려면 이 파일을 사용한다.
+#   python3 -m venv .venv && source .venv/bin/activate
+#   pip install -r requirements.txt
+#
+# 버전은 고정하지 않았다. 특정 버전을 강제해야 하는 경우 강의 공지를 따른다.
+# 확인됨(2026-08-23): 템플릿 기본 python3 3.12.3. pip3는 기본 설치되어 있지 않다
+# (python3-pip 를 따로 설치해야 하며, 그때 버전은 24.0+dfsg-1ubuntu1.3 이다).
+
+Flask
+redis

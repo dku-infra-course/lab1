@@ -1,0 +1,13 @@
+<!-- week04 · 백엔드 구분용 페이지 템플릿
+     배치 경로: /var/www/html/index.html (각 백엔드 웹서버)
+
+     어느 백엔드가 응답했는지 눈으로 구분하기 위해 두 서버의 내용을 다르게 둔다.
+     {{SERVER_LABEL}} 을 아래 값으로 치환한다.
+
+       WEBSERVER01 : Web Server 01
+       WEBSERVER02 : Administrator Page   (리버스 프록시 /admin 실습용)
+                     또는 Web Server 02   (L4 Stream 분산 확인용, B2 단계)
+
+     운영에서는 두 서버가 같은 콘텐츠를 서빙한다. 구분용 표기는 실습 목적이다.
+-->
+<h1>{{SERVER_LABEL}}</h1>
