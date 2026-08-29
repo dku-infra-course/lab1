@@ -85,8 +85,8 @@ fi
 
 printf '\nFailover 검증 순서 (수동)\n'
 printf '  1) web01, web02 각각에서 로그를 따라가며 둔다\n'
-printf '       sudo tail -f /var/log/syslog | grep -i vrrp\n'
-printf '       (syslog 가 없으면) sudo journalctl -u keepalived -f\n'
+printf '       sudo journalctl -u keepalived -f\n'
+printf '       (rsyslog 를 따로 설치해 /var/log/syslog 가 있으면) sudo tail -f /var/log/syslog | grep -i vrrp\n'
 printf '  2) web01 에서 장애 주입:  sudo systemctl stop keepalived.service\n'
 printf '  3) web02 로그에 "Entering MASTER STATE" 가 나오는지 확인\n'
 printf '  4) curl http://%s 응답이 Backup Server 로 바뀌는지 확인\n' "$VIP"
