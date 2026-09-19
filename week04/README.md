@@ -11,17 +11,17 @@
 
 ## 2. 사전 조건
 
-| 역할 | 가이드 표기 | 자리표시자 | 실습 기본값 | 설치 대상 |
+| 역할 | 가이드 표기 | 자리표시자 | IP 할당 | 설치 대상 |
 |---|---|---|---|---|
-| 백엔드 웹서버 1 | `WEBSERVER01-{{STUDENT_ID}}` | `{{WEB01_IP}}` | `192.168.0.10` | Apache |
-| 백엔드 웹서버 2 | `WEBSERVER02-{{STUDENT_ID}}` | `{{WEB02_IP}}` | `192.168.0.11` | Apache |
-| 로드밸런서 | `nginx-{{STUDENT_ID}}` / `LB-{{STUDENT_ID}}` | `{{LB_IP}}` | `192.168.0.20` | Nginx |
-| IPVS 가상 IP (심화) | | `{{VIP}}` | `192.168.0.100` | |
+| 백엔드 웹서버 1 | `web01-{{STUDENT_ID}}` | `{{WEB01_IP}}` | Shared Network DHCP(`10.0.X.X`) | Apache |
+| 백엔드 웹서버 2 | `web02-{{STUDENT_ID}}` | `{{WEB02_IP}}` | Shared Network DHCP(`10.0.X.X`) | Apache |
+| 로드밸런서 | `lb-{{STUDENT_ID}}` | `{{LB_IP}}` | Shared Network DHCP(`10.0.X.X`) | Nginx |
+| IPVS 가상 IP (심화, B3) | | `{{VIP}}` | `192.168.0.100`(B3 전용 격리 네트워크에서만) | |
 
-- 세 VM은 같은 격리 네트워크에 있고 사설 IP로 서로 통신되어야 한다.
+- 세 VM은 같은 **기본 Shared Network**에 있고 사설 IP(`10.0.X.X`)로 서로 통신되어야 한다. IP는 고정하지 않고 DHCP로 받은 값을 `terraform output` 또는 콘솔에서 그때그때 확인한다.
 - 백엔드는 **Apache**, 앞단 로드밸런서는 **Nginx** 다. 서로 다른 소프트웨어를 쓰는 것이 정상이다.
-- IPVS 심화(B3)는 이번 주 본 실습(web01·web02·lb)과 별개의 격리 네트워크에서 진행한다. 3주차 환경을 이어 쓰지 않는다.
-- 외부(브라우저) 확인이 필요하면 가상 라우터 공용 IP의 필요 포트를 Nginx VM으로 포트포워딩하고, 방화벽에서 **VPN 대역으로 한정** 하여 개방한다. 가상 라우터 공용 IP는 계정마다 다르므로 본인 화면에서 직접 확인한다.
+- IPVS 심화(B3)는 이번 주 본 실습(web01·web02·lb)과 별개의 **격리 네트워크**(CIDR `192.168.0.0/24`)에서 진행한다. 3주차 환경을 이어 쓰지 않고 새로 만든다.
+- Shared Network는 VPN 연결 상태에서 사설 IP로 바로 접속되므로, 본 실습에는 포트포워딩·방화벽 규칙이 필요 없다.
 
 ## 3. 파일
 
@@ -72,9 +72,9 @@ sudo apt update && sudo apt install -y nginx git
 git clone https://github.com/hyungwook-0221/dku-infra-labs.git
 cd dku-infra-labs/week04-loadbalancer
 
-# 자리표시자를 본인 환경 값으로 치환하여 배치
-sed -e 's/{{WEB01_IP}}/192.168.0.10/g' \
-    -e 's/{{WEB02_IP}}/192.168.0.11/g' \
+# 자리표시자를 본인 환경 값(콘솔 또는 terraform output으로 확인한 실제 사설 IP)으로 치환하여 배치
+sed -e 's/{{WEB01_IP}}/<web01 실제 사설 IP>/g' \
+    -e 's/{{WEB02_IP}}/<web02 실제 사설 IP>/g' \
     nginx-lb.conf | sudo tee /etc/nginx/sites-available/http-lb
 
 # 활성화 (기존 default 링크는 해제)
@@ -99,8 +99,8 @@ nginx: configuration file /etc/nginx/nginx.conf test is successful
 ```nginx
 upstream webservers {
     least_conn;      # 또는 ip_hash;
-    server 192.168.0.10:80 weight=3 max_fails=3 fail_timeout=10s;
-    server 192.168.0.11:80 weight=1 max_fails=3 fail_timeout=10s;
+    server {{WEB01_IP}}:80 weight=3 max_fails=3 fail_timeout=10s;
+    server {{WEB02_IP}}:80 weight=1 max_fails=3 fail_timeout=10s;
 }
 ```
 
@@ -116,10 +116,10 @@ chmod +x verify-lb.sh
 또는 직접:
 
 ```bash
-for i in {1..10}; do curl http://192.168.0.20; sleep 1; done         # L7 upstream
-for i in {1..10}; do curl http://192.168.0.20:8080; sleep 1; done    # L4 stream
-curl http://192.168.0.11/     # 백엔드 직접
-curl http://192.168.0.20/     # 프록시 경유 (동일 응답)
+for i in {1..10}; do curl http://{{LB_IP}}; sleep 1; done         # L7 upstream
+for i in {1..10}; do curl http://{{LB_IP}}:8080; sleep 1; done    # L4 stream
+curl http://{{WEB02_IP}}/     # 백엔드 직접
+curl http://{{LB_IP}}/        # 프록시 경유 (동일 응답)
 ```
 
 통과 기준
@@ -134,13 +134,11 @@ curl http://192.168.0.20/     # 프록시 경유 (동일 응답)
 
 ## 6. 정리 (rollback)
 
-이번 주 확인이 끝났으면 VM(web01·web02·lb)과 격리 네트워크를 정리(Destroy)한다. 5주차는 이 환경을 이어 쓰지 않고 새로 만든다.
+이번 주 확인이 끝났으면 VM(web01·web02·lb)을 정리(Destroy)한다. 기본 Shared Network는 이 실습이 만든 것이 아니므로 삭제되지 않는다(다른 학생과 같이 쓰는 자원이니 직접 지우지 않는다). 5주차는 이 환경을 이어 쓰지 않고 새로 만든다.
 
-IPVS 심화(B3)를 별도 환경에서 진행했다면 그 네트워크·VM 3대도 함께 정리한다.
+IPVS 심화(B3)를 별도 격리 네트워크에서 진행했다면 그 네트워크·VM 3대도 함께 정리한다.
 
 ```bash
 sudo ipvsadm -C
 sudo ip addr del 192.168.0.100/32 dev ens3
 ```
-
-외부에 열어 둔 포트포워딩·방화벽 규칙은 VM과 함께 정리되지만, 콘솔에서 직접 만든 규칙이 남아 있다면 같이 닫는다.

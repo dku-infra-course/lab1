@@ -10,10 +10,10 @@
 
 | 주차 | 폴더 | 실습 가이드 파일 | 주제 |
 |---|---|---|---|
-| 1주차 | `week01-environment/` | `실습_W1_환경준비.html` | Solid Cloud 콘솔, 격리 네트워크, 첫 VM, 포트포워딩 |
-| 2주차 | `week02-linux-network/` | `실습_W2_리눅스네트워크.html` | 서버 스펙 확인, 리눅스 기본, 네트워크 확인, Apache |
-| 3주차 | `week03-ha-keepalived/` | `실습_W3_이중화.html` | Keepalived VIP Failover (Active/Backup) |
-| 4주차 | `week04-loadbalancer/` | `실습_W4_로드밸런싱.html` | Nginx 리버스 프록시와 로드밸런싱 |
+| 1주차 | `week01/` | `실습_W1_환경준비.html` | Solid Cloud 콘솔, 격리 네트워크, 첫 VM, 포트포워딩 |
+| 2주차 | `week02/` | `실습_W2_리눅스네트워크.html` | 서버 스펙 확인, 리눅스 기본, 네트워크 확인, Apache |
+| 3주차 | `week03/` | `실습_W3_이중화.html` | Keepalived VIP Failover (Active/Backup) |
+| 4주차 | `week04/` | `실습_W4_로드밸런싱.html` | Nginx 리버스 프록시와 로드밸런싱 |
 | 5주차 | `week05-cache/` | `실습_W5_캐시.html` | Redis 애플리케이션 캐시, Nginx/Squid 웹 캐시 |
 
 ## 사용법
@@ -27,7 +27,7 @@ ls -1
 해당 주차 폴더로 이동해 그 폴더의 `README.md` 를 먼저 읽는다.
 
 ```bash
-cd week03-ha-keepalived
+cd week03
 cat README.md
 ```
 
@@ -44,12 +44,12 @@ chmod +x *.sh
 
 | 자리표시자 | 의미 | 실습 기본 관례값 |
 |---|---|---|
-| `{{WEB01_IP}}` | 웹 서버 1 사설 IP | `192.168.0.10` |
-| `{{WEB02_IP}}` | 웹 서버 2 사설 IP | `192.168.0.11` |
-| `{{LB_IP}}` | 로드밸런서(Nginx) VM 사설 IP | `192.168.0.20` |
-| `{{VIP}}` | 가상 IP (Keepalived / IPVS) | `192.168.0.100` |
-| `{{WEBSERVER_IP}}` | 5주차 백엔드 서버 사설 IP | `192.168.0.10` |
-| `{{CACHE_IP}}` | 5주차 캐시 서버 사설 IP | `192.168.0.20` |
+| `{{WEB01_IP}}` | 4주차 웹 서버 1 사설 IP | Shared Network DHCP 할당(`10.0.X.X`), 고정값 없음 |
+| `{{WEB02_IP}}` | 4주차 웹 서버 2 사설 IP | Shared Network DHCP 할당(`10.0.X.X`), 고정값 없음 |
+| `{{LB_IP}}` | 4주차 로드밸런서(Nginx) VM 사설 IP | Shared Network DHCP 할당(`10.0.X.X`), 고정값 없음 |
+| `{{VIP}}` | 가상 IP (3주차 Keepalived / 4주차 B3 IPVS, 둘 다 별도 격리 네트워크) | `192.168.0.100` |
+| `{{WEBSERVER_IP}}` | 5주차 백엔드 서버 사설 IP | Shared Network DHCP 할당(`10.0.X.X`), 고정값 없음 |
+| `{{CACHE_IP}}` | 5주차 캐시 서버 사설 IP | Shared Network DHCP 할당(`10.0.X.X`), 고정값 없음 |
 | `{{IFACE}}` | 네트워크 인터페이스 이름 | `ens3` (`ip link` 로 확인) |
 | `{{PUBLIC_IP}}` | 가상 라우터 공용 IP | 계정마다 다름 (본인 화면에서 직접 확인해 채운다) |
 | `{{STUDENT_ID}}` | 학번 (VM·네트워크 이름에 사용) | 본인 학번 |
@@ -59,7 +59,7 @@ chmod +x *.sh
 ### 치환 방법 1: 편집기로 직접 수정
 
 ```bash
-vim week03-ha-keepalived/keepalived-web01.conf   # {{VIP}}, {{IFACE}} 등을 찾아 수정
+vim week03/keepalived-web01.conf   # {{VIP}}, {{IFACE}} 등을 찾아 수정
 ```
 
 ### 치환 방법 2: 스크립트 인자로 전달
@@ -68,14 +68,12 @@ vim week03-ha-keepalived/keepalived-web01.conf   # {{VIP}}, {{IFACE}} 등을 찾
 
 ## 네트워크 관례
 
-3주차 이후 실습은 하나의 격리 네트워크(`192.168.0.0/24`) 안에서 진행한다.
+주차마다 쓰는 네트워크가 다르다. 표기와 실제 값이 다르면 아래를 기준으로 읽는다.
 
-```
-192.168.0.10   web01 / webserver01 / 5주차 백엔드 서버
-192.168.0.11   web02 / webserver02
-192.168.0.20   lb (Nginx 로드밸런서) / 5주차 캐시 서버
-192.168.0.100  VIP (Keepalived, IPVS 공통)
-```
+| 주차 | 네트워크 | IP |
+|---|---|---|
+| 1·3주차, 4주차 B3(심화) | 격리 네트워크(`192.168.0.0/24`, 매주 새로 만든다) | 고정: `.10`(web01) · `.11`(web02) · `.20`(lb/director) · `.100`(VIP) |
+| 2·4주차(본 실습)·5주차 | 기본 Shared Network(공용, 학생이 만들지 않는다) | DHCP 할당(`10.0.X.X`), 고정값 없음 |
 
 실제 배정 대역이 다르면 위 표의 값을 본인 대역으로 바꾸어 읽는다.
 

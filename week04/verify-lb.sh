@@ -10,21 +10,28 @@
 #   ./verify-lb.sh                       # 기본값으로 전체 확인
 #   ./verify-lb.sh 20                    # 20회 반복 요청
 #
-# 환경 변수:
-#   LB_IP=192.168.0.20      로드밸런서(Nginx) VM IP
-#   WEB01_IP=192.168.0.10   백엔드 1
-#   WEB02_IP=192.168.0.11   백엔드 2
-#   VIP=192.168.0.100       IPVS / HAProxy 가상 IP (심화 단계에서만 사용)
-#   STREAM_PORT=8080        Nginx stream(L4) 리스닝 포트
+# 환경 변수 (본 실습 3대는 Shared Network DHCP 라 고정 기본값이 없다. 셋 다 필수):
+#   LB_IP=<lb 실제 사설 IP>       로드밸런서(Nginx) VM IP
+#   WEB01_IP=<web01 실제 사설 IP> 백엔드 1
+#   WEB02_IP=<web02 실제 사설 IP> 백엔드 2
+#   VIP=192.168.0.100             IPVS / HAProxy 가상 IP (심화 B3, 별도 격리 네트워크에서만 사용)
+#   STREAM_PORT=8080              Nginx stream(L4) 리스닝 포트
 
 set -euo pipefail
 
 COUNT="${1:-10}"
-LB_IP="${LB_IP:-192.168.0.20}"
-WEB01_IP="${WEB01_IP:-192.168.0.10}"
-WEB02_IP="${WEB02_IP:-192.168.0.11}"
+LB_IP="${LB_IP:-}"
+WEB01_IP="${WEB01_IP:-}"
+WEB02_IP="${WEB02_IP:-}"
 VIP="${VIP:-192.168.0.100}"
 STREAM_PORT="${STREAM_PORT:-8080}"
+
+case "$LB_IP$WEB01_IP$WEB02_IP" in
+  *'{{'*|'')
+    echo "LB_IP·WEB01_IP·WEB02_IP를 환경 변수로 넘겨야 한다(고정 기본값 없음, Shared Network DHCP)." >&2
+    echo "  LB_IP=10.0.x.x WEB01_IP=10.0.x.x WEB02_IP=10.0.x.x ./verify-lb.sh" >&2
+    exit 1 ;;
+esac
 
 hr() { printf '\n=== %s ===\n' "$1"; }
 

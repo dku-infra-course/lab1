@@ -10,9 +10,9 @@
 #   ./bench.sh                 # 기본값으로 전체 측정
 #   ./bench.sh 5               # 각 항목을 5회씩 측정
 #
-# 환경 변수:
-#   WEBSERVER_IP=192.168.0.10  백엔드(Flask) 서버 IP
-#   CACHE_IP=192.168.0.20      캐시 서버(Nginx/Squid) IP
+# 환경 변수 (Shared Network DHCP 라 고정 기본값이 없다. 둘 다 필수):
+#   WEBSERVER_IP=<webserver 실제 사설 IP>  백엔드(Flask) 서버 IP
+#   CACHE_IP=<cache 실제 사설 IP>          캐시 서버(Nginx/Squid) IP
 #
 # 실행 위치에 따라 무엇을 측정할 수 있는지 다르다.
 #   백엔드 서버 VM : 원본 / Redis 캐시
@@ -22,14 +22,14 @@
 set -euo pipefail
 
 RUNS="${1:-3}"
-WEBSERVER_IP="${WEBSERVER_IP:-192.168.0.10}"
-CACHE_IP="${CACHE_IP:-192.168.0.20}"
+WEBSERVER_IP="${WEBSERVER_IP:-}"
+CACHE_IP="${CACHE_IP:-}"
 
-# 자리표시자를 그대로 둔 채 실행한 경우를 걸러 준다.
+# Shared Network는 DHCP라 고정 기본값이 없다. 둘 다 명시적으로 받아야 한다.
 case "$WEBSERVER_IP$CACHE_IP" in
-  *'{{'*)
-    echo "자리표시자를 치환하지 않았다. 아래처럼 환경 변수로 넘긴다." >&2
-    echo "  WEBSERVER_IP=192.168.0.10 CACHE_IP=192.168.0.20 ./bench.sh" >&2
+  *'{{'*|'')
+    echo "WEBSERVER_IP·CACHE_IP를 환경 변수로 넘겨야 한다(고정 기본값 없음, Shared Network DHCP). 아래처럼 실제 사설 IP로 넘긴다." >&2
+    echo "  WEBSERVER_IP=10.0.x.x CACHE_IP=10.0.x.x ./bench.sh" >&2
     exit 1 ;;
 esac
 

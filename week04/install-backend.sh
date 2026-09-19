@@ -86,7 +86,7 @@ cat <<DONE
 완료했다. 두 백엔드 모두 구성한 뒤, 로드밸런서 VM 에서 다음을 진행한다.
 
   sudo apt install -y nginx
-  sed -e 's/{{WEB01_IP}}/192.168.0.10/g' -e 's/{{WEB02_IP}}/192.168.0.11/g' \\
+  sed -e 's/{{WEB01_IP}}/<web01 실제 사설 IP>/g' -e 's/{{WEB02_IP}}/<web02 실제 사설 IP>/g' \\
       nginx-lb.conf | sudo tee /etc/nginx/sites-available/http-lb
   sudo ln -s /etc/nginx/sites-available/http-lb /etc/nginx/sites-enabled/
   sudo unlink /etc/nginx/sites-enabled/default

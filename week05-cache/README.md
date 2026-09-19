@@ -27,14 +27,14 @@
 
 ## 2. 사전 조건
 
-| VM | 자리표시자 | 실습 기본값 | 설치할 것 |
+| VM | 자리표시자 | IP 할당 | 설치할 것 |
 |---|---|---|---|
-| `webserver-{{STUDENT_ID}}` (백엔드) | `{{WEBSERVER_IP}}` | `192.168.0.10` | Flask 앱, Redis |
-| `cache-{{STUDENT_ID}}` (캐시) | `{{CACHE_IP}}` | `192.168.0.20` | Nginx, Squid |
+| `webserver-{{STUDENT_ID}}` (백엔드) | `{{WEBSERVER_IP}}` | Shared Network DHCP(`10.0.X.X`) | Flask 앱, Redis |
+| `cache-{{STUDENT_ID}}` (캐시) | `{{CACHE_IP}}` | Shared Network DHCP(`10.0.X.X`) | Nginx, Squid |
 
-- 두 VM이 같은 격리 네트워크에 있고 사설 IP로 통신되어야 한다.
+- 두 VM이 같은 **기본 Shared Network**에 있고 사설 IP(`10.0.X.X`)로 통신되어야 한다. IP는 고정하지 않고 `terraform output` 또는 콘솔에서 확인한 값을 쓴다.
 - 두 VM 모두 SSH 접속이 되고, Egress(아웃바운드)가 허용되어 있어야 한다.
-- 실습 트래픽 포트: 백엔드 `5000`과 Squid `3128`은 외부에 열지 않고 같은 격리 네트워크 안에서만 접근한다. Nginx `80`을 노트북에서 직접 확인하려면 포트포워딩을 만들고 방화벽 Source CIDR을 VPN 대역(`10.8.0.0/24`)으로 한정한다.
+- 실습 트래픽 포트: 백엔드 `5000`과 Squid `3128`은 외부에 열지 않는다. Nginx `80`을 포함해 세 포트 모두 VPN 연결 상태에서 사설 IP로 직접 접근한다(Shared Network는 포트포워딩이 없는 네트워크 오퍼링이라 만들 수도 없다).
 - VPN 연결 유지.
 
 ## 3. 파일
@@ -144,7 +144,7 @@ sudo mkdir -p /var/cache/nginx/api_cache
 프록시 설정을 배치하고 활성화한다.
 
 ```bash
-sed 's/{{WEBSERVER_IP}}/192.168.0.10/g' nginx-cache.conf \
+sed 's/{{WEBSERVER_IP}}/<webserver 실제 사설 IP>/g' nginx-cache.conf \
   | sudo tee /etc/nginx/sites-available/backend-proxy
 
 sudo ln -s /etc/nginx/sites-available/backend-proxy /etc/nginx/sites-enabled/
@@ -175,7 +175,7 @@ sudo systemctl status squid
 두 VM 에서 각각 실행한 뒤 결과를 합쳐 표로 정리한다.
 
 ```bash
-WEBSERVER_IP=192.168.0.10 CACHE_IP=192.168.0.20 ./bench.sh 3
+WEBSERVER_IP=<webserver 실제 사설 IP> CACHE_IP=<cache 실제 사설 IP> ./bench.sh 3
 ```
 
 ### 5-2. 항목별 통과 기준
@@ -236,12 +236,10 @@ sudo systemctl daemon-reload
 # 실습 키만 삭제한다. FLUSHALL 은 쓰지 않는다.
 redis-cli -a '{{REDIS_PASSWORD}}' DEL products:all
 
-# Redis 중지 (다음 주차에서 다시 쓸 계획이면 남겨 둔다)
+# Redis 중지
 sudo systemctl disable --now redis-server
 ```
 
 `requirepass` 로 쓴 비밀번호는 실습이 끝나면 폐기한다. 저장소·과제 캡처에 그대로 남기지 않는다.
 
-## 7. 확인 필요 항목
-
-- 저장소 최종 URL(`github.com/hyungwook-0221/dku-infra-labs`)
+이번 주 확인이 끝났으면 VM(webserver·cache)을 정리(Destroy)한다. 기본 Shared Network는 이 실습이 만든 것이 아니므로 삭제되지 않는다. 6주차는 이 환경을 이어 쓰지 않고 새로 만든다.
