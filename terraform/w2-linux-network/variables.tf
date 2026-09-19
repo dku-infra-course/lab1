@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# 접속 정보 (자격증명은 terraform.tfvars 또는 TF_VAR_* 환경변수로 받는다)
+# 접속 정보 (자격증명은 terraform.tfvars 에 채운다. api_key/secret_key/name_prefix 는 필수다)
 # ---------------------------------------------------------------------------
 
 variable "api_url" {
@@ -57,7 +57,6 @@ variable "root_disk_size" {
 variable "name_prefix" {
   description = "학번이나 강사 식별자. VM 이름은 가이드 표기(web01-{학번})에 맞춰 web01-<name_prefix> 형태로 만들어진다"
   type        = string
-  default     = "w2net"
 }
 
 variable "vm_password" {

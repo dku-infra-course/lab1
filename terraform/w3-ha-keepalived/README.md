@@ -31,7 +31,7 @@ VRRP 는 같은 서브넷 안에서만 동작하므로 Shared Network 가 아니
 - 로컬에 Terraform 1.0 이상, **VPN 연결**.
 - CloudStack API Key / Secret Key. **발급 위치: 우측 상단 프로필 > 사용자 상세 > API 키 생성.**
 - 컴퓨트 오퍼링 이름은 확인됨: `Small`(1core/2GB) · `Medium`(2core/4GB) · `Large`(4core/8GB) · `XLarge`(8core/16GB) · `Custom`. 방화벽 Source CIDR 로 쓸 **VPN 대역은 `10.8.0.0/24`로 확인됨.**
-- 자격증명은 `terraform.tfvars`(gitignore 대상) 또는 `TF_VAR_api_key` / `TF_VAR_secret_key`.
+- 자격증명은 `terraform.tfvars`(gitignore 대상)에 `api_key`/`secret_key`/`name_prefix`만 채운다.
 
 ## 3. 실행
 

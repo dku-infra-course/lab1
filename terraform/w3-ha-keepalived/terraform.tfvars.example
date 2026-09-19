@@ -1,11 +1,12 @@
 # 이 파일을 terraform.tfvars 로 복사한 뒤 값을 채운다 (.gitignore 대상).
 #   cp terraform.tfvars.example terraform.tfvars
 
-api_key    = "여기에_API_KEY"
-secret_key = "여기에_SECRET_KEY"
+# --- 필수: 이 3개만 채우면 된다 ---
+api_key     = "여기에_API_KEY"       # 콘솔 [계정] > [API 키] 화면에서 발급
+secret_key  = "여기에_SECRET_KEY"
+name_prefix = "여기에_학번"          # 본인 학번. VM·네트워크 이름에 그대로 쓰인다
 
-# --- 필요할 때만 조정 ---
-# name_prefix           = "w3ha"
+# --- 필요할 때만 조정 (기본값 그대로 써도 된다) ---
 # service_offering_name = "Small"       # 확인됨: 콘솔에도 이 표기로 그대로 존재한다(Small/Medium/Large/XLarge/Custom 중)
 # template_name         = "Ubuntu_24.04"
 # template_filter       = "featured"

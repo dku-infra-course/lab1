@@ -24,9 +24,7 @@ Apache 설치와 페이지 교체는 W2 실습에서 학생이 직접 한다.
 - CloudStack API Key / Secret Key. **발급 위치: 우측 상단 프로필 > 사용자 상세 > API 키 생성.**
 - 자격증명은 코드에 넣지 않는다.
   ```bash
-  cp terraform.tfvars.example terraform.tfvars   # 파일로 넣는 방법 (.gitignore 대상)
-  # 또는
-  export TF_VAR_api_key="..." ; export TF_VAR_secret_key="..."
+  cp terraform.tfvars.example terraform.tfvars   # 이 파일에 api_key/secret_key/name_prefix 만 채운다(.gitignore 대상)
   ```
 - 컴퓨트 오퍼링 이름(`service_offering_name`)은 확인됨: `Small`(1core/2GB) · `Medium`(2core/4GB) · `Large`(4core/8GB) · `XLarge`(8core/16GB) · `Custom`.
   Web IDE 를 쓸 계획이면 Medium 이상, K8s 는 Large 를 권장한다.

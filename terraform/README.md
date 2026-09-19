@@ -57,7 +57,8 @@ choco install terraform
 ```bash
 cd terraform/w1-environment
 
-cp terraform.tfvars.example terraform.tfvars   # api_key, secret_key, shared_network_id 등을 본인 값으로 채운다
+cp terraform.tfvars.example terraform.tfvars   # 파일을 하나 복제한다
+vim terraform.tfvars                           # api_key, secret_key, name_prefix(학번) 3개만 채운다
 terraform init      # provider 플러그인을 내려받는다(폴더마다 한 번)
 terraform plan      # 무엇을 만들지 미리 확인한다
 terraform apply     # 확인 후 y 입력, 실제로 만든다
@@ -66,6 +67,10 @@ terraform apply     # 확인 후 y 입력, 실제로 만든다
 
 terraform destroy   # 실습이 끝나면 반드시 지운다
 ```
+
+**채워야 하는 값은 3개뿐이다: `api_key`, `secret_key`, `name_prefix`(본인 학번).** 그 외 VM 사양·네트워크 값은 주차마다 이미 정해진 기본값이 코드에 들어 있어 손댈 필요가 없다(`shared_network_id`처럼 미리 채워진 값도 있다). `terraform.tfvars.example`을 열어 보면 어떤 값이 필수이고 어떤 값이 선택인지 주석으로 구분되어 있다.
+
+**환경변수(`TF_VAR_api_key` 등)는 쓰지 않는다.** Windows(PowerShell/cmd)·Linux·macOS가 환경변수를 설정하는 문법이 전부 달라서 처음 쓰는 사람에게는 오히려 헷갈린다. 위 방식대로 파일에 값을 채우면 OS와 무관하게 동일하게 동작한다.
 
 ## 대표 명령 정리
 

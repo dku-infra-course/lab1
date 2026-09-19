@@ -1,17 +1,18 @@
 # 이 파일을 terraform.tfvars 로 복사한 뒤 값을 채운다 (.gitignore 대상).
 #   cp terraform.tfvars.example terraform.tfvars
 
-api_key    = "여기에_API_KEY"
-secret_key = "여기에_SECRET_KEY"
+# --- 필수: 이 3개만 채우면 된다 ---
+api_key     = "여기에_API_KEY"       # 콘솔 [계정] > [API 키] 화면에서 발급
+secret_key  = "여기에_SECRET_KEY"
+name_prefix = "여기에_학번"          # 본인 학번. VM 이름(webserver-{학번}, cache-{학번})에 그대로 쓰인다
 
-# --- 필수 ---
-# 기존 공용 Shared Network 의 UUID. 새 네트워크를 만들지 않는다.
+# 기존 공용 Shared Network 의 UUID. 새 네트워크를 만들지 않으므로 이 값은
+# 이미 확인된 값을 그대로 둔다(바꿀 필요 없음).
 # 확인됨(2026-08-23, API 조회): 이름 "Shared Network", CIDR 10.0.0.0/16, 게이트웨이 10.0.0.1
 shared_network_id   = "492737b8-5bc2-4e28-a6a7-8e29fa491587"
 shared_network_name = "Shared Network"
 
-# --- 필요할 때만 조정 ---
-# name_prefix           = "w5cache"
+# --- 필요할 때만 조정 (기본값 그대로 써도 된다) ---
 # service_offering_name = "Small"       # 확인됨: 콘솔에도 이 표기로 그대로 존재한다(Small/Medium/Large/XLarge/Custom 중)
 # template_name         = "Ubuntu_24.04"
 # ssh_keypair_name      = "key-학번"

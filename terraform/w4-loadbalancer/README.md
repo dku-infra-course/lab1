@@ -37,7 +37,7 @@
 ## 3. 실행
 
 ```bash
-cp terraform.tfvars.example terraform.tfvars   # api_key / secret_key / shared_network_id
+cp terraform.tfvars.example terraform.tfvars   # api_key / secret_key / name_prefix(학번)
 terraform init
 terraform plan
 terraform apply
