@@ -1,0 +1,20 @@
+# 이 파일을 terraform.tfvars 로 복사한 뒤 값을 채운다 (.gitignore 대상).
+#   cp terraform.tfvars.example terraform.tfvars
+
+api_key    = "여기에_API_KEY"
+secret_key = "여기에_SECRET_KEY"
+
+# --- 필수 ---
+# 기존 공용 Shared Network 의 UUID. 새 네트워크를 만들지 않는다.
+# 콘솔 [네트워크] > 해당 네트워크 상세 화면의 ID 를 그대로 붙인다.
+# 확인됨(2026-08-23, API 조회): 이름 "Shared Network", CIDR 10.0.0.0/16, 게이트웨이 10.0.0.1
+shared_network_id   = "492737b8-5bc2-4e28-a6a7-8e29fa491587"
+shared_network_name = "Shared Network"
+
+# --- 필요할 때만 조정 ---
+# name_prefix           = "w2net"
+# service_offering_name = "Small"          # 확인됨: 콘솔에도 이 표기로 그대로 존재한다(Small/Medium/Large/XLarge/Custom 중)
+# template_name         = "Ubuntu_24.04"
+# template_filter       = "featured"       # Ubuntu_22.04 는 "community"
+# ssh_keypair_name      = "key-학번"
+# create_web02          = true             # 두 대 사이 사설 IP 통신까지 확인할 때

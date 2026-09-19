@@ -1,0 +1,65 @@
+#cloud-config
+# W5 캐시 서버 사전 상태
+#   - Nginx / Squid 설치
+#   - 캐시 존(proxy_cache_path), 리버스 프록시 캐시 설정, Squid cache_dir 은
+#     실습의 학습 대상이므로 기본값(preinstall_conf = false)에서는 배치하지 않는다.
+#
+# 백엔드(Flask) 서버 IP (참고): ${webserver_ip}
+password: ${vm_password}
+chpasswd:
+  expire: false
+ssh_pwauth: true
+%{ if length(extra_ssh_authorized_keys) > 0 }
+ssh_authorized_keys:
+%{ for k in extra_ssh_authorized_keys }
+  - ${k}
+%{ endfor }
+%{ endif }
+
+package_update: true
+packages:
+  - nginx
+  - squid
+  - curl
+
+write_files:
+  - path: /etc/dku-lab-role
+    permissions: '0644'
+    content: |
+      cache
+  - path: /etc/dku-lab-backends
+    permissions: '0644'
+    content: |
+      webserver=${webserver_ip}
+%{ if preinstall_conf }
+  - path: /etc/nginx/conf.d/api-cache-zone.conf
+    permissions: '0644'
+    encoding: b64
+    content: ${base64encode(nginx_cache_zone)}
+  - path: /etc/nginx/sites-available/backend-proxy
+    permissions: '0644'
+    encoding: b64
+    content: ${base64encode(nginx_cache_conf)}
+  - path: /etc/squid/conf.d/dku-lab-cache-dir.conf
+    permissions: '0644'
+    encoding: b64
+    content: ${base64encode(squid_snippet)}
+%{ endif }
+
+runcmd:
+  - systemctl enable --now nginx
+  - systemctl enable --now squid
+%{ if preinstall_conf }
+  - mkdir -p /var/cache/nginx/api_cache
+  - ln -sf /etc/nginx/sites-available/backend-proxy /etc/nginx/sites-enabled/backend-proxy
+  - rm -f /etc/nginx/sites-enabled/default
+  - nginx -t
+  - systemctl reload nginx
+  - systemctl stop squid
+  - rm -rf /var/spool/squid/*
+  - squid -z
+  - sleep 3
+  - systemctl start squid
+%{ endif }
+  - systemctl is-active nginx || true
+  - systemctl is-active squid || true

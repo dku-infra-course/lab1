@@ -1,0 +1,36 @@
+# week05 · Squid 포워드 프록시 캐시 설정 조각
+#
+# /etc/squid/squid.conf 의 맨 아래에 아래 줄을 추가하거나,
+# 파일 안에서 같은 지시어를 찾아 주석을 제거한다.
+#
+# 전체 파일을 덮어쓰지 않는다. Squid 기본 설정 파일에는 실습에 필요한
+# 기본 ACL(localnet 등)과 http_port 3128 설정이 이미 들어 있다.
+
+# 디스크 캐시 디렉터리
+#   ufs                  저장 방식
+#   /var/spool/squid     캐시 경로
+#   100                  최대 크기 (MB)
+#   16                   1단계 하위 디렉터리 수
+#   256                  2단계 하위 디렉터리 수
+cache_dir ufs /var/spool/squid 100 16 256
+
+# ---------------------------------------------------------------
+# 적용 순서 (첫 실행 시 squid -z 가 필수다)
+#
+#   sudo systemctl stop squid
+#   sudo rm -rf /var/spool/squid/*
+#   sudo squid -z
+#   sleep 3
+#   sudo systemctl start squid
+#   sudo systemctl status squid
+#
+# 확인
+#   time curl --proxy http://localhost:3128 http://{{WEBSERVER_IP}}:5000/api/products
+#   sudo cat /var/log/squid/access.log
+#     첫 요청  TCP_MISS/200
+#     재요청   TCP_MEM_HIT/200 또는 TCP_HIT/200
+#
+# 주의: Squid 가 응답을 캐시하려면 백엔드 응답에 캐싱 가능한 Cache-Control 이
+# 있어야 한다. Part 1 의 'public, max-age=10' 헤더가 붙는 /api/products 경로로
+# 확인한다. jsonify 로 바꾼 엔드포인트에는 이 헤더가 없다.
+# ---------------------------------------------------------------

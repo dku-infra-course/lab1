@@ -1,0 +1,24 @@
+# 이 파일을 terraform.tfvars 로 복사한 뒤 값을 채운다.
+# terraform.tfvars 는 .gitignore 대상이므로 커밋되지 않는다.
+#
+#   cp terraform.tfvars.example terraform.tfvars
+#
+# 또는 파일을 만들지 않고 환경변수로 넘겨도 된다.
+#   export TF_VAR_api_key="..."
+#   export TF_VAR_secret_key="..."
+
+api_key    = "여기에_API_KEY"
+secret_key = "여기에_SECRET_KEY"
+
+# --- 필요할 때만 조정 ---
+# name_prefix           = "w1env"
+# service_offering_name = "Small"          # 확인됨: 콘솔에도 이 표기로 그대로 존재한다(Small/Medium/Large/XLarge/Custom 중)
+# template_name         = "Ubuntu_24.04"
+# template_filter       = "featured"       # Ubuntu_22.04 는 "community"
+# ssh_keypair_name      = "key-학번"       # 콘솔에 등록한 SSH 키쌍 이름
+
+# 보안: 실습 가이드는 VPN 대역으로 한정하라고 안내한다. 확인됨(2026-08-23): VPN 대역은 10.8.0.0/24
+# ssh_allowed_cidr      = "10.8.0.0/24"
+
+# web02 까지 만들어 두 대 사이 통신을 확인하려면 true
+# create_web02          = true

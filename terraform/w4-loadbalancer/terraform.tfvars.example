@@ -1,0 +1,24 @@
+# 이 파일을 terraform.tfvars 로 복사한 뒤 값을 채운다 (.gitignore 대상).
+#   cp terraform.tfvars.example terraform.tfvars
+
+api_key    = "여기에_API_KEY"
+secret_key = "여기에_SECRET_KEY"
+
+# --- 필수 ---
+# 기존 공용 Shared Network 의 UUID. 새 네트워크를 만들지 않는다.
+# 확인됨(2026-08-23, API 조회): 이름 "Shared Network", CIDR 10.0.0.0/16, 게이트웨이 10.0.0.1
+shared_network_id   = "492737b8-5bc2-4e28-a6a7-8e29fa491587"
+shared_network_name = "Shared Network"
+
+# --- 필요할 때만 조정 ---
+# name_prefix           = "w4lb"
+# service_offering_name = "Small"       # 확인됨: 콘솔에도 이 표기로 그대로 존재한다(Small/Medium/Large/XLarge/Custom 중)
+# template_name         = "Ubuntu_24.04"
+# ssh_keypair_name      = "key-학번"
+
+# 백엔드 구분 페이지 문구. 리버스 프록시 /admin 실습에서는 web02 를 아래처럼 바꾼다
+# web01_page_label      = "Web Server 01"
+# web02_page_label      = "Administrator Page"
+
+# LB 설정까지 자동화 (기본 false: 실습 대상이므로 Nginx 설치만 한다)
+# preinstall_lb_config  = true

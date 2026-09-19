@@ -6,6 +6,10 @@
 .terraform/
 .terraform.lock.hcl
 crash.log
+crash.*.log
+tfplan*
+*.tfplan
+verify-out/
 
 # 자격증명 / 비밀값 (절대 커밋하지 않는다)
 .env

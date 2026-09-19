@@ -1,0 +1,61 @@
+#cloud-config
+# W3 이중화 실습 사전 상태 (역할: ${role})
+#   - preinstall_packages = false 이고 preinstall_conf = false 면(둘 다 기본값)
+#     아무 패키지도 설치하지 않는다. 학생이 콘솔로 직접 만드는 순정 Ubuntu VM과
+#     조건을 맞추기 위한 것이다.
+#   - preinstall_packages = true 면 apache2·keepalived·curl 을 "설치만" 한다.
+#     keepalived 서비스는 정지·비활성화 상태로 남긴다(설정 배치·기동은 실습 대상).
+#   - preinstall_conf = true 면 패키지 설치까지 포함해서 keepalived.conf 배치와
+#     서비스 기동까지 마친 완성 상태로 만든다.
+#
+# 파일 내용은 YAML 블록 스칼라 대신 base64(encoding: b64)로 넣는다.
+# 들여쓰기나 특수문자 때문에 cloud-init 이 깨지는 것을 막기 위한 것이다.
+password: ${vm_password}
+chpasswd:
+  expire: false
+ssh_pwauth: true
+%{ if length(extra_ssh_authorized_keys) > 0 }
+ssh_authorized_keys:
+%{ for k in extra_ssh_authorized_keys }
+  - ${k}
+%{ endfor }
+%{ endif }
+
+%{ if preinstall_packages || preinstall_conf }
+package_update: true
+packages:
+  - apache2
+  - keepalived
+  - curl
+%{ endif }
+
+write_files:
+  - path: /etc/dku-lab-role
+    permissions: '0644'
+    content: |
+      ${role}
+%{ if preinstall_packages || preinstall_conf }
+  - path: /var/www/html/index.html
+    permissions: '0644'
+    content: |
+      <h1>${page_title}</h1>
+%{ endif }
+%{ if preinstall_conf }
+  - path: /etc/keepalived/keepalived.conf
+    permissions: '0644'
+    encoding: b64
+    content: ${base64encode(keepalived_conf)}
+%{ endif }
+
+%{ if preinstall_packages || preinstall_conf }
+runcmd:
+  - systemctl enable --now apache2
+%{ if preinstall_conf }
+  - systemctl enable keepalived
+  - systemctl restart keepalived
+%{ else }
+  - systemctl stop keepalived || true
+  - systemctl disable keepalived || true
+%{ endif }
+  - systemctl is-active apache2 || true
+%{ endif }

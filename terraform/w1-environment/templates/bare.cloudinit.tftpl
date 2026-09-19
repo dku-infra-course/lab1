@@ -1,0 +1,15 @@
+#cloud-config
+# W1 실습 환경: 순수 Ubuntu 상태를 만든다.
+# 패키지 설치·서비스 설정은 학생이 콘솔과 SSH 에서 직접 하는 학습 대상이므로
+# 여기서 자동화하지 않는다. 비밀번호 로그인만 켜서 SSH 접속이 되게 한다.
+password: ${vm_password}
+chpasswd:
+  expire: false
+ssh_pwauth: true
+%{ if length(extra_ssh_authorized_keys) > 0 }
+ssh_authorized_keys:
+%{ for k in extra_ssh_authorized_keys }
+  - ${k}
+%{ endfor }
+%{ endif }
+package_update: false

@@ -1,0 +1,14 @@
+#cloud-config
+# W2 실습 환경: 순수 Ubuntu 상태를 만든다.
+# Apache 설치와 페이지 교체는 실습에서 학생이 직접 하므로 넣지 않는다.
+password: ${vm_password}
+chpasswd:
+  expire: false
+ssh_pwauth: true
+%{ if length(extra_ssh_authorized_keys) > 0 }
+ssh_authorized_keys:
+%{ for k in extra_ssh_authorized_keys }
+  - ${k}
+%{ endfor }
+%{ endif }
+package_update: false

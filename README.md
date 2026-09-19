@@ -16,11 +16,13 @@
 | 4주차 | `week04/` | `실습_W4_로드밸런싱.html` | Nginx 리버스 프록시와 로드밸런싱 |
 | 5주차 | `week05-cache/` | `실습_W5_캐시.html` | Redis 애플리케이션 캐시, Nginx/Squid 웹 캐시 |
 
+`terraform/` 폴더에는 각 주차 실습 환경(VM·네트워크)을 만드는 Terraform 코드가 주차별로 들어 있다. Terraform을 처음 써 본다면 `terraform/README.md`를 먼저 읽는다.
+
 ## 사용법
 
 ```bash
-git clone https://github.com/hyungwook-0221/dku-infra-labs.git
-cd dku-infra-labs
+git clone https://github.com/dku-infra-course/lab1.git
+cd lab1
 ls -1
 ```
 

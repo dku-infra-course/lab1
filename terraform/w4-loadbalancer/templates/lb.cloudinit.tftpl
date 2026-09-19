@@ -1,0 +1,58 @@
+#cloud-config
+# W4 로드밸런서 사전 상태
+#   - preinstall_packages = false 이고 preinstall_conf = false 면(둘 다 기본값)
+#     아무 것도 설치하지 않는다. 학생이 콘솔로 직접 만드는 순정 Ubuntu VM과
+#     조건을 맞추기 위한 것이다.
+#   - preinstall_packages = true 면 Nginx "설치만" 한다. upstream 블록, weight,
+#     least_conn, ip_hash, max_fails/fail_timeout(수동 헬스체크), stream(L4)
+#     설정은 모두 실습_W4_로드밸런싱.html 의 학습 대상이므로 여기서 만들지 않는다.
+#   - preinstall_conf = true 인 경우엔 패키지 설치까지 포함해서 labs 저장소의
+#     nginx-lb.conf 를 배치한다.
+#
+# 백엔드 IP (참고): web01 = ${web01_ip} / web02 = ${web02_ip}
+password: ${vm_password}
+chpasswd:
+  expire: false
+ssh_pwauth: true
+%{ if length(extra_ssh_authorized_keys) > 0 }
+ssh_authorized_keys:
+%{ for k in extra_ssh_authorized_keys }
+  - ${k}
+%{ endfor }
+%{ endif }
+
+%{ if preinstall_packages || preinstall_conf }
+package_update: true
+packages:
+  - nginx
+  - curl
+%{ endif }
+
+write_files:
+  - path: /etc/dku-lab-role
+    permissions: '0644'
+    content: |
+      lb
+  - path: /etc/dku-lab-backends
+    permissions: '0644'
+    content: |
+      web01=${web01_ip}
+      web02=${web02_ip}
+%{ if preinstall_conf }
+  - path: /etc/nginx/sites-available/http-lb
+    permissions: '0644'
+    encoding: b64
+    content: ${base64encode(nginx_lb_conf)}
+%{ endif }
+
+%{ if preinstall_packages || preinstall_conf }
+runcmd:
+  - systemctl enable --now nginx
+%{ if preinstall_conf }
+  - ln -sf /etc/nginx/sites-available/http-lb /etc/nginx/sites-enabled/http-lb
+  - rm -f /etc/nginx/sites-enabled/default
+  - nginx -t
+  - systemctl reload nginx
+%{ endif }
+  - systemctl is-active nginx || true
+%{ endif }

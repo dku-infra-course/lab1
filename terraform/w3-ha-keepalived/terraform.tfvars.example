@@ -1,0 +1,22 @@
+# 이 파일을 terraform.tfvars 로 복사한 뒤 값을 채운다 (.gitignore 대상).
+#   cp terraform.tfvars.example terraform.tfvars
+
+api_key    = "여기에_API_KEY"
+secret_key = "여기에_SECRET_KEY"
+
+# --- 필요할 때만 조정 ---
+# name_prefix           = "w3ha"
+# service_offering_name = "Small"       # 확인됨: 콘솔에도 이 표기로 그대로 존재한다(Small/Medium/Large/XLarge/Custom 중)
+# template_name         = "Ubuntu_24.04"
+# template_filter       = "featured"
+# ssh_keypair_name      = "key-학번"
+# vrrp_interface        = "ens3"        # ip link 로 확인한 실제 이름
+
+# 보안: VPN 대역으로 좁히는 것을 권장. 확인됨(2026-08-23): VPN 대역은 10.8.0.0/24
+# ssh_allowed_cidr      = "10.8.0.0/24"
+
+# keepalived 설정 배치·기동까지 자동화 (기본 false: 실습 대상이므로 수동)
+# preinstall_keepalived_config = true
+
+# 멀티캐스트가 막힌 환경에서만 true. DKU 격리망은 멀티캐스트가 동작한다
+# keepalived_use_unicast      = false

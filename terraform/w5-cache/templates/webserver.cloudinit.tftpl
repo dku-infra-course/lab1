@@ -1,0 +1,60 @@
+#cloud-config
+# W5 백엔드 서버 사전 상태
+#   - Python / Flask / Redis 클라이언트 / Redis 서버 설치
+#   - 앱 코드(app.py)와 Redis 보안 설정(bind / requirepass)은 실습의 학습 대상이므로
+#     기본값(preinstall_app = false, redis_password = "")에서는 배치하지 않는다.
+password: ${vm_password}
+chpasswd:
+  expire: false
+ssh_pwauth: true
+%{ if length(extra_ssh_authorized_keys) > 0 }
+ssh_authorized_keys:
+%{ for k in extra_ssh_authorized_keys }
+  - ${k}
+%{ endfor }
+%{ endif }
+
+package_update: true
+packages:
+  - python3-pip
+  - python3-flask
+  - python3-redis
+  - redis-server
+  - curl
+
+write_files:
+  - path: /etc/dku-lab-role
+    permissions: '0644'
+    content: |
+      webserver
+%{ if set_redis_pass }
+  - path: /etc/redis/dku-lab-extra.conf
+    permissions: '0640'
+    encoding: b64
+    content: ${base64encode(redis_extra_conf)}
+%{ endif }
+%{ if preinstall_app }
+  - path: /home/ubuntu/backend-app/app.py
+    owner: 'ubuntu:ubuntu'
+    permissions: '0644'
+    encoding: b64
+    content: ${base64encode(app_py)}
+  - path: /etc/systemd/system/backend-app.service
+    permissions: '0644'
+    encoding: b64
+    content: ${base64encode(backend_service_unit)}
+%{ endif }
+
+runcmd:
+  - systemctl enable --now redis-server
+%{ if set_redis_pass }
+  - grep -q '^requirepass ' /etc/redis/redis.conf || cat /etc/redis/dku-lab-extra.conf >> /etc/redis/redis.conf
+  - chown redis:redis /etc/redis/redis.conf
+  - systemctl restart redis-server
+%{ endif }
+%{ if preinstall_app }
+  - chown -R ubuntu:ubuntu /home/ubuntu/backend-app
+  - systemctl daemon-reload
+  - systemctl enable --now backend-app
+%{ endif }
+  - systemctl is-active redis-server || true

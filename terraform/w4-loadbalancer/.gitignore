@@ -1,0 +1,18 @@
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+terraform.tfvars
+*.auto.tfvars
+tfplan*
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# verify.sh 결과물 (서버 IP·로그가 그대로 들어가므로 커밋하지 않는다)
+verify-out/

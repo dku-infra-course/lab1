@@ -1,0 +1,42 @@
+#cloud-config
+# W4 백엔드 웹서버 사전 상태 (역할: ${role})
+#   - preinstall_packages = false(기본값)면 아무 패키지도 설치하지 않는다.
+#     학생이 콘솔로 직접 만드는 순정 Ubuntu VM과 조건을 맞추기 위한 것이다.
+#   - preinstall_packages = true 면 Apache 설치와 구분 페이지 작성까지 마친다.
+#     어느 백엔드가 응답했는지 눈으로 구분할 수 있게 페이지 문구를 다르게 둔다
+#     (운영에서는 두 서버가 같은 콘텐츠를 서빙한다. 구분 표기는 실습 목적이다)
+password: ${vm_password}
+chpasswd:
+  expire: false
+ssh_pwauth: true
+%{ if length(extra_ssh_authorized_keys) > 0 }
+ssh_authorized_keys:
+%{ for k in extra_ssh_authorized_keys }
+  - ${k}
+%{ endfor }
+%{ endif }
+
+%{ if preinstall_packages }
+package_update: true
+packages:
+  - apache2
+  - curl
+%{ endif }
+
+write_files:
+  - path: /etc/dku-lab-role
+    permissions: '0644'
+    content: |
+      ${role}
+%{ if preinstall_packages }
+  - path: /var/www/html/index.html
+    permissions: '0644'
+    content: |
+      <h1>${page_label}</h1>
+%{ endif }
+
+%{ if preinstall_packages }
+runcmd:
+  - systemctl enable --now apache2
+  - systemctl is-active apache2 || true
+%{ endif }
