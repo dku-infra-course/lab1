@@ -8,7 +8,7 @@
 # Shared Network 를 쓰므로 IP 는 DHCP 로 10.0.X.X 가 할당된다. VPN 에서 직접 SSH 가 되고,
 # lb 는 내부 IP 로 백엔드에 curl 한다.
 #
-# preinstall_lb_config = true 로 두면 labs/week04-loadbalancer/nginx-lb.conf 를
+# preinstall_lb_config = true 로 두면 week04/nginx-lb.conf 를
 # 그대로 가져와 {{WEB01_IP}} / {{WEB02_IP}} 만 실제 할당 IP 로 치환해 배치한다.
 
 locals {

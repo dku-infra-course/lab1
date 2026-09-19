@@ -10,7 +10,7 @@
 # 강사가 failover 만 빠르게 재확인하려면 true 로 두고 apply 한다.
 
 locals {
-  # labs/week03-ha-keepalived 의 설정 원본을 그대로 재사용하고
+  # week03/ 의 설정 원본을 그대로 재사용하고
   # 자리표시자({{IFACE}} / {{VIP}} / {{WEB01_IP}} / {{WEB02_IP}})만 치환한다.
   conf_src_web01 = file("${path.module}/files/${var.keepalived_use_unicast ? "keepalived-unicast-web01.conf" : "keepalived-web01.conf"}")
   conf_src_web02 = file("${path.module}/files/${var.keepalived_use_unicast ? "keepalived-unicast-web02.conf" : "keepalived-web02.conf"}")

@@ -101,7 +101,7 @@ sudo systemctl enable --now keepalived
 ```
 
 설정 원본은 `files/keepalived-web01.conf` / `files/keepalived-web02.conf` 에도 그대로 들어 있다
-(`labs/week03-ha-keepalived` 와 동일한 파일이다).
+(저장소의 `week03/` 와 동일한 파일이다).
 
 확인 명령:
 

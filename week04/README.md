@@ -40,8 +40,8 @@
 
 ```bash
 sudo apt update && sudo apt install -y git
-git clone https://github.com/hyungwook-0221/dku-infra-labs.git
-cd dku-infra-labs/week04-loadbalancer
+git clone https://github.com/dku-infra-course/lab1.git
+cd lab1/week04
 chmod +x *.sh
 ```
 
@@ -69,8 +69,8 @@ Nginx VM 에서:
 
 ```bash
 sudo apt update && sudo apt install -y nginx git
-git clone https://github.com/hyungwook-0221/dku-infra-labs.git
-cd dku-infra-labs/week04-loadbalancer
+git clone https://github.com/dku-infra-course/lab1.git
+cd lab1/week04
 
 # 자리표시자를 본인 환경 값(콘솔 또는 terraform output으로 확인한 실제 사설 IP)으로 치환하여 배치
 sed -e 's/{{WEB01_IP}}/<web01 실제 사설 IP>/g' \

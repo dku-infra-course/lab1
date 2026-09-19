@@ -28,28 +28,28 @@ VM 안에서 이 저장소를 받아 스크립트를 실행한다.
 ```bash
 sudo apt update
 sudo apt install -y git
-git clone https://github.com/hyungwook-0221/dku-infra-labs.git
-cd dku-infra-labs/week02-linux-network
-chmod +x checks.sh
-./checks.sh
+git clone https://github.com/dku-infra-course/lab1.git
+cd lab1/week02
+chmod +x inspect.sh
+./inspect.sh
 ```
 
 부분 실행도 가능하다.
 
 ```bash
-./checks.sh spec     # lscpu, nproc, free -h, df -h
-./checks.sh linux    # uname, os-release, whoami, id, systemctl
-./checks.sh net      # ip a, ip route, ss -tlnp, ping, curl
-./checks.sh web      # Apache 상태 (설치 후)
+./inspect.sh spec     # lscpu, nproc, free -h, df -h
+./inspect.sh linux    # uname, os-release, whoami, id, systemctl
+./inspect.sh net      # ip a, ip route, ss -tlnp, ping, curl
+./inspect.sh web      # Apache 상태 (설치 후)
 ```
 
 게이트웨이나 외부 확인 주소를 바꿀 때:
 
 ```bash
-GATEWAY=192.168.0.1 EXTERNAL_URL=https://ubuntu.com ./checks.sh net
+GATEWAY=192.168.0.1 EXTERNAL_URL=https://ubuntu.com ./inspect.sh net
 ```
 
-`checks.sh` 는 **읽기 전용 확인 명령만** 실행한다. 아래 설치·변경 작업은 가이드를 보며 직접 수행한다.
+`inspect.sh` 는 **읽기 전용 확인 명령만** 실행한다. 아래 설치·변경 작업은 가이드를 보며 직접 수행한다.
 
 ```bash
 # 패키지 설치 확인

@@ -38,7 +38,7 @@
 | `redis_password` | `""` | `bind 127.0.0.1 ::1` 과 `requirepass` 를 redis.conf 에 추가하고 앱에도 전달 |
 
 배치되는 파일은 모두 `files/` 안의 원본을 그대로 쓴다
-(`labs/week05-cache/` 와 동일한 `app.py`, `nginx-cache.conf`, `squid.conf.snippet`).
+(저장소의 `week05-cache/` 와 동일한 `app.py`, `nginx-cache.conf`, `squid.conf.snippet`).
 
 ## 2. 전제
 

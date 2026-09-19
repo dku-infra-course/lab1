@@ -6,15 +6,15 @@
 # 읽기 전용 명령만 사용하며, 시스템을 변경하지 않는다.
 #
 # 사용법:
-#   chmod +x checks.sh
-#   ./checks.sh              # 전체 실행
-#   ./checks.sh spec         # 스펙만
-#   ./checks.sh linux        # 리눅스 기본만
-#   ./checks.sh net          # 네트워크만
-#   ./checks.sh web          # Apache 확인만 (설치되어 있어야 함)
+#   chmod +x inspect.sh
+#   ./inspect.sh              # 전체 실행
+#   ./inspect.sh spec         # 스펙만
+#   ./inspect.sh linux        # 리눅스 기본만
+#   ./inspect.sh net          # 네트워크만
+#   ./inspect.sh web          # Apache 확인만 (설치되어 있어야 함)
 #
 # 게이트웨이·외부 통신 확인 대상은 환경 변수로 바꿀 수 있다.
-#   GATEWAY=192.168.0.1 EXTERNAL_URL=https://ubuntu.com ./checks.sh net
+#   GATEWAY=192.168.0.1 EXTERNAL_URL=https://ubuntu.com ./inspect.sh net
 
 set -euo pipefail
 

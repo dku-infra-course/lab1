@@ -83,8 +83,8 @@ ssh ubuntu@<lb IP>
 cat /etc/dku-lab-backends          # web01 / web02 IP 확인
 
 sudo apt update && sudo apt install -y git
-git clone https://github.com/dku-infra-course/labs.git   # 저장소 URL: 확인 필요
-cd labs/week04-loadbalancer
+git clone https://github.com/dku-infra-course/lab1.git
+cd lab1/week04
 
 sed -e "s/{{WEB01_IP}}/<web01 IP>/g" -e "s/{{WEB02_IP}}/<web02 IP>/g" \
     nginx-lb.conf | sudo tee /etc/nginx/sites-available/http-lb

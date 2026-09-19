@@ -53,8 +53,8 @@
 
 ```bash
 sudo apt update && sudo apt install -y git
-git clone https://github.com/hyungwook-0221/dku-infra-labs.git
-cd dku-infra-labs/week05-cache
+git clone https://github.com/dku-infra-course/lab1.git
+cd lab1/week05-cache
 chmod +x bench.sh
 ```
 
@@ -118,8 +118,8 @@ sudo systemctl status backend-app
 
 ```bash
 sudo apt update && sudo apt install -y git nginx squid
-git clone https://github.com/hyungwook-0221/dku-infra-labs.git
-cd dku-infra-labs/week05-cache
+git clone https://github.com/dku-infra-course/lab1.git
+cd lab1/week05-cache
 chmod +x bench.sh
 ```
 
