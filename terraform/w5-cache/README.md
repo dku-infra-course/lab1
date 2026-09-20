@@ -17,25 +17,25 @@
                               데이터 소스 (느린 조회, 약 2초)
 ```
 
-**학습 대상은 자동화하지 않는다.** 패키지만 설치하고, 앱 코드 배치와 캐시 설정은 남겨 둔다.
+**학습 대상은 자동화하지 않는다.** 기본값(`preinstall_app_code = false`, `preinstall_cache_config = false`)은 패키지조차 설치하지 않은 순정 Ubuntu다. 학생이 콘솔로 직접 만드는 VM과 조건을 맞추기 위한 것이다.
 
 ## 1. 만들어지는 것
 
 | 리소스 | 값 |
 |---|---|
 | 네트워크 | **새로 만들지 않는다.** 기존 공용 Shared Network 를 `shared_network_id` 로 지정 |
-| webserver | `python3-pip`, `python3-flask`, `python3-redis`, `redis-server` 설치 |
-| cache | `nginx`, `squid` 설치 |
+| webserver | 기본값은 순정 Ubuntu(패키지 미설치). `preinstall_app_code = true` 일 때만 `python3-pip`·`python3-flask`·`python3-redis`·`redis-server` 설치 |
+| cache | 기본값은 순정 Ubuntu(패키지 미설치). `preinstall_cache_config = true` 일 때만 `nginx`·`squid` 설치 |
 | IP | Shared Network DHCP 로 `10.0.X.X`. cache 의 `/etc/dku-lab-backends` 에 webserver IP 기록 |
 | 접속 | VPN 연결 후 `ssh ubuntu@10.0.X.X` |
 
-옵션 변수로 사전 구성 범위를 넓힐 수 있다.
+옵션 변수로 사전 구성 범위를 넓힐 수 있다(강사가 캐시 효과만 빠르게 재측정할 때 쓴다).
 
 | 변수 | 기본값 | true 로 두면 |
 |---|---|---|
-| `preinstall_app_code` | `false` | `app.py` 를 `/home/ubuntu/backend-app/` 에 배치하고 `backend-app.service` 로 기동 |
-| `preinstall_cache_config` | `false` | Nginx 캐시 존(`/etc/nginx/conf.d/api-cache-zone.conf`) + `backend-proxy` 설정 + Squid `cache_dir` 배치 |
-| `redis_password` | `""` | `bind 127.0.0.1 ::1` 과 `requirepass` 를 redis.conf 에 추가하고 앱에도 전달 |
+| `preinstall_app_code` | `false` | `python3-flask`·`redis-server` 등 패키지 설치 + `app.py` 를 `/home/ubuntu/backend-app/` 에 배치하고 `backend-app.service` 로 기동 |
+| `preinstall_cache_config` | `false` | `nginx`·`squid` 패키지 설치 + Nginx 캐시 존(`/etc/nginx/conf.d/api-cache-zone.conf`) + `backend-proxy` 설정 + Squid `cache_dir` 배치 |
+| `redis_password` | `""` | `bind 127.0.0.1 ::1` 과 `requirepass` 를 redis.conf 에 추가하고 앱에도 전달(`preinstall_app_code = true` 와 함께 써야 의미가 있다) |
 
 배치되는 파일은 모두 `files/` 안의 원본을 그대로 쓴다
 (저장소의 `week05-cache/` 와 동일한 `app.py`, `nginx-cache.conf`, `squid.conf.snippet`).

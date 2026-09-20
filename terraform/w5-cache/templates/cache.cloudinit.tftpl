@@ -1,8 +1,9 @@
 #cloud-config
 # W5 캐시 서버 사전 상태
-#   - Nginx / Squid 설치
-#   - 캐시 존(proxy_cache_path), 리버스 프록시 캐시 설정, Squid cache_dir 은
-#     실습의 학습 대상이므로 기본값(preinstall_conf = false)에서는 배치하지 않는다.
+#   - 기본값(preinstall_conf = false)이면 아무 패키지도 설치하지 않는다. 학생이
+#     콘솔로 직접 만드는 순정 Ubuntu VM과 조건을 맞추기 위한 것이다.
+#   - preinstall_conf = true 면 Nginx/Squid 설치와 캐시 존·리버스 프록시 설정·
+#     Squid cache_dir 배치까지 마친다.
 #
 # 백엔드(Flask) 서버 IP (참고): ${webserver_ip}
 password: ${vm_password}
@@ -16,11 +17,13 @@ ssh_authorized_keys:
 %{ endfor }
 %{ endif }
 
+%{ if preinstall_conf }
 package_update: true
 packages:
   - nginx
   - squid
   - curl
+%{ endif }
 
 write_files:
   - path: /etc/dku-lab-role
@@ -46,10 +49,10 @@ write_files:
     content: ${base64encode(squid_snippet)}
 %{ endif }
 
+%{ if preinstall_conf }
 runcmd:
   - systemctl enable --now nginx
   - systemctl enable --now squid
-%{ if preinstall_conf }
   - mkdir -p /var/cache/nginx/api_cache
   - ln -sf /etc/nginx/sites-available/backend-proxy /etc/nginx/sites-enabled/backend-proxy
   - rm -f /etc/nginx/sites-enabled/default
@@ -60,6 +63,6 @@ runcmd:
   - squid -z
   - sleep 3
   - systemctl start squid
-%{ endif }
   - systemctl is-active nginx || true
   - systemctl is-active squid || true
+%{ endif }

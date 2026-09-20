@@ -1,12 +1,12 @@
 # webserver(앱 + Redis) 1대 + cache(Nginx + Squid) 1대.
 #
-# cloud-init 이 하는 일 (기본값)
-#   - webserver: python3-pip, python3-flask, python3-redis, redis-server 설치
-#   - cache    : nginx, squid 설치
-#
+# 기본값(preinstall_app_code = false, preinstall_cache_config = false)은 패키지조차
+# 설치하지 않은 순정 Ubuntu다. 학생이 콘솔로 직접 만드는 VM과 조건을 맞추기 위한
+# 것이다. python3-flask/redis-server(webserver), nginx/squid(cache) 설치부터
 # 앱 코드 배치, Redis 보안 설정(bind / requirepass), Nginx 캐시 존과 프록시 설정,
-# Squid cache_dir 은 모두 실습_W5_캐시.html 의 학습 대상이므로 기본값에서는 넣지 않는다.
-# 강사가 캐시 효과만 빠르게 재측정하려면 preinstall_* 변수를 true 로 둔다.
+# Squid cache_dir 까지 모두 실습_W5_캐시.html 의 학습 대상이므로 기본값에서는
+# 아무것도 하지 않는다. 강사가 캐시 효과만 빠르게 재측정하려면 preinstall_* 변수를
+# true 로 둔다.
 #
 # Shared Network 를 쓰므로 IP 는 DHCP 로 10.0.X.X 가 할당된다.
 # cache 의 Nginx 는 webserver 의 5000 포트를 upstream 으로 쓰므로,

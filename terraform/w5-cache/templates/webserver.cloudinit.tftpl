@@ -1,8 +1,10 @@
 #cloud-config
 # W5 백엔드 서버 사전 상태
-#   - Python / Flask / Redis 클라이언트 / Redis 서버 설치
-#   - 앱 코드(app.py)와 Redis 보안 설정(bind / requirepass)은 실습의 학습 대상이므로
-#     기본값(preinstall_app = false, redis_password = "")에서는 배치하지 않는다.
+#   - 기본값(preinstall_app = false)이면 아무 패키지도 설치하지 않는다. 학생이
+#     콘솔로 직접 만드는 순정 Ubuntu VM과 조건을 맞추기 위한 것이다.
+#   - preinstall_app = true 면 Python/Flask/Redis 클라이언트/Redis 서버 설치와
+#     앱 코드(app.py) 배치·기동까지 마친다. Redis 보안 설정(requirepass)은
+#     redis_password 를 함께 넣어야 적용된다.
 password: ${vm_password}
 chpasswd:
   expire: false
@@ -14,6 +16,7 @@ ssh_authorized_keys:
 %{ endfor }
 %{ endif }
 
+%{ if preinstall_app }
 package_update: true
 packages:
   - python3-pip
@@ -21,19 +24,20 @@ packages:
   - python3-redis
   - redis-server
   - curl
+%{ endif }
 
 write_files:
   - path: /etc/dku-lab-role
     permissions: '0644'
     content: |
       webserver
+%{ if preinstall_app }
 %{ if set_redis_pass }
   - path: /etc/redis/dku-lab-extra.conf
     permissions: '0640'
     encoding: b64
     content: ${base64encode(redis_extra_conf)}
 %{ endif }
-%{ if preinstall_app }
   - path: /home/ubuntu/backend-app/app.py
     owner: 'ubuntu:ubuntu'
     permissions: '0644'
@@ -45,6 +49,7 @@ write_files:
     content: ${base64encode(backend_service_unit)}
 %{ endif }
 
+%{ if preinstall_app }
 runcmd:
   - systemctl enable --now redis-server
 %{ if set_redis_pass }
@@ -52,9 +57,8 @@ runcmd:
   - chown redis:redis /etc/redis/redis.conf
   - systemctl restart redis-server
 %{ endif }
-%{ if preinstall_app }
   - chown -R ubuntu:ubuntu /home/ubuntu/backend-app
   - systemctl daemon-reload
   - systemctl enable --now backend-app
-%{ endif }
   - systemctl is-active redis-server || true
+%{ endif }
