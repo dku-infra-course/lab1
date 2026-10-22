@@ -1,0 +1,8 @@
+# 단일 스테이지: 빌드 도구(Go 컴파일러)와 소스가 최종 이미지에 그대로 남는다.
+FROM golang:1.24
+WORKDIR /src
+COPY go.mod main.go ./
+RUN CGO_ENABLED=0 go build -o /app/server .
+EXPOSE 8000
+USER 10001
+CMD ["/app/server"]
