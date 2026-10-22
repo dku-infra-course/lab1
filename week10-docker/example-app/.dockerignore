@@ -1,0 +1,14 @@
+.git
+.gitignore
+.env
+.env.*
+*.pem
+*.key
+__pycache__/
+*.pyc
+.venv/
+venv/
+Dockerfile*
+compose*.yaml
+*.md
+*.tar

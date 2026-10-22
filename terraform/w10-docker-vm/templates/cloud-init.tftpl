@@ -1,0 +1,17 @@
+#cloud-config
+# 10주차 Docker 실습 VM: Docker Engine + Compose 플러그인.
+# Trivy 는 설치하지 않는다. 실습 D에서 고정 버전 컨테이너로 실행한다(공급망 사고 대응).
+password: ${jsonencode(vm_password)}
+chpasswd:
+  expire: false
+ssh_pwauth: true
+write_files:
+  - path: /etc/dku-lab-role
+    permissions: '0644'
+    content: |
+      docker
+runcmd:
+  - apt-get update
+  - DEBIAN_FRONTEND=noninteractive apt-get install -y docker.io docker-compose-v2 git curl
+  - systemctl enable --now docker
+  - usermod -aG docker ubuntu

@@ -15,8 +15,11 @@
 | 3주차 | `week03/` | `실습_W3_이중화.html` | Keepalived VIP Failover (Active/Backup) |
 | 4주차 | `week04/` | `실습_W4_로드밸런싱.html` | Nginx 리버스 프록시와 로드밸런싱 |
 | 5주차 | `week05-cache/` | `실습_W5_캐시.html` | Redis 애플리케이션 캐시, Nginx/Squid 웹 캐시 |
+| 9주차 | `week09-iac/` (+ `terraform/w9-iac`, `terraform/w9-modules`) | `실습_W9_Terraform기초.html` | Terraform 기초, 모듈, destroy → apply 재현 |
+| 10주차 | `week10-docker/` | `실습_W10_Docker컨테이너.html` | 이미지 빌드·푸시, 멀티스테이지, Compose, Trivy |
 
-`terraform/` 폴더에는 각 주차 실습 환경(VM·네트워크)을 만드는 Terraform 코드가 주차별로 들어 있다. Terraform을 처음 써 본다면 `terraform/README.md`를 먼저 읽는다.
+`terraform/` 폴더에는 각 주차 실습 환경(VM·네트워크)을 만드는 Terraform 코드가 주차별로 들어 있다.
+`w1-environment` ~ `w5-cache`(1~5주차), `w9-iac` · `w9-modules`(9주차), `w10-docker-vm`(10주차, 선택). Terraform을 처음 써 본다면 `terraform/README.md`를 먼저 읽는다.
 
 ## 사용법
 
@@ -58,6 +61,15 @@ chmod +x *.sh
 | `{{REDIS_PASSWORD}}` | Redis `requirepass` 값 | 직접 정한 강한 값 |
 | `{{SERVER_LABEL}}` | 4주차 백엔드 구분용 페이지 문구 | `Web Server 01` / `Administrator Page` |
 
+### 9주차 이후 자리표시자
+
+9주차 이후 파일은 `{{...}}` 대신 아래 두 값을 쓴다.
+
+| 자리표시자 | 의미 | 치환 방법 |
+|---|---|---|
+| `<DH_USER>` | 본인 Docker Hub 아이디 (YAML의 이미지 자리) | `sed -i "s#<DH_USER>#$DH_USER#" 파일들` |
+| `여기에_...` (terraform.tfvars.example) | API Key · Secret Key · 학번 · Shared Network ID | `cp terraform.tfvars.example terraform.tfvars` 후 값 입력 (커밋 금지) |
+
 ### 치환 방법 1: 편집기로 직접 수정
 
 ```bash
@@ -81,7 +93,7 @@ vim week03/keepalived-web01.conf   # {{VIP}}, {{IFACE}} 등을 찾아 수정
 
 ## 주의: 자격증명은 커밋하지 않는다
 
-- SSH 개인키(`*.pem`, `id_rsa`), `.env`, `*.tfvars`, Redis 비밀번호, 클라우드 API 키를 저장소에 올리지 않는다. `.gitignore` 에 기본 패턴이 들어 있지만, 최종 책임은 커밋하는 사람에게 있다.
+- SSH 개인키(`*.pem`, `id_rsa`), `.env`, `*.tfvars`, kubeconfig, Redis 비밀번호, 클라우드 API 키를 저장소에 올리지 않는다. `.gitignore` 에 기본 패턴이 들어 있지만, 최종 책임은 커밋하는 사람에게 있다.
 - 커밋 전 확인:
 
   ```bash

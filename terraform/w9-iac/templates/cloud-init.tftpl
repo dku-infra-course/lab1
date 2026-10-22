@@ -1,0 +1,22 @@
+#cloud-config
+# 역할: ${role}
+password: ${vm_password}
+chpasswd:
+  expire: false
+ssh_pwauth: true
+%{ if length(extra_ssh_authorized_keys) > 0 ~}
+ssh_authorized_keys:
+%{ for k in extra_ssh_authorized_keys ~}
+  - ${k}
+%{ endfor ~}
+%{ endif ~}
+package_update: true
+packages:
+%{ for p in packages ~}
+  - ${p}
+%{ endfor ~}
+write_files:
+  - path: /etc/dku-lab-role
+    permissions: '0644'
+    content: |
+      ${role}

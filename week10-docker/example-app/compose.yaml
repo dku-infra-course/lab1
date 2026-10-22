@@ -1,0 +1,27 @@
+services:
+  app:
+    build: .
+    image: myapp:1.0.0
+    ports:
+      - "8000:8000"
+    environment:
+      APP_VERSION: "1.0.0"
+      REDIS_HOST: redis
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  redis-data:

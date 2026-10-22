@@ -1,6 +1,6 @@
 # Terraform 사용 안내
 
-Terraform을 처음 써보는 사람을 위한 안내다. 각 주차 폴더(`w1-environment/` ~ `w5-cache/`)의 구체적인 변수·순서는 그 폴더의 `README.md`를 따르고, 여기서는 공통으로 알아야 할 개념·설치·명령·주의사항만 다룬다.
+Terraform을 처음 써보는 사람을 위한 안내다. 각 주차 폴더(`w1-environment/` ~ `w5-cache/`, `w9-iac/` ~ `w10-docker-vm/`)의 구체적인 변수·순서는 그 폴더의 `README.md`를 따르고, 여기서는 공통으로 알아야 할 개념·설치·명령·주의사항만 다룬다.
 
 ## Terraform이 무엇이고 왜 쓰는가
 
@@ -140,5 +140,8 @@ terraform destroy
 | `w3-ha-keepalived/` | 3주차: 격리 네트워크 + VM 2대(Keepalived VIP 이중화) |
 | `w4-loadbalancer/` | 4주차: Shared Network에 웹서버 2대 + LB 1대(Nginx 로드밸런싱), 선택으로 IPVS 심화 3대 추가 |
 | `w5-cache/` | 5주차: Shared Network에 웹서버 1대 + 캐시서버 1대(Redis·Nginx·Squid) |
+| `w9-iac/` | 9주차: Shared Network에 3-Tier VM 4대(web 2 · cache 1 · db 1, Small x3 + Medium x1). 평면 코드(비교용) |
+| `w9-modules/` | 9주차: 같은 구성을 web · cache · database 모듈로 나눈 코드. |
+| `w10-docker-vm/` | 10주차(선택): Docker 실습 VM 1대(Medium). |
 
 각 폴더 안의 `README.md`에 그 주차의 변수 목록·전제 조건·실행 예시가 자세히 있다.
