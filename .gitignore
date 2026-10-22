@@ -24,6 +24,8 @@ id_ed25519.*
 known_hosts
 secrets.yml
 secrets.yaml
+kubeconfig*
+*.kubeconfig
 
 # 학생별 환경값을 채운 사본
 *.local

@@ -1,0 +1,10 @@
+# 비교용 단일 스테이지. 멀티스테이지 결과와 크기를 견준다.
+FROM python:3.12-slim
+ARG APP_VERSION=1.0.0
+ENV APP_VERSION=${APP_VERSION} PYTHONUNBUFFERED=1
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY app.py .
+EXPOSE 8000
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "1", "--threads", "4", "app:app"]

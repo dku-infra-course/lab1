@@ -1,0 +1,6 @@
+# terraform.tfvars 로 복사해 값을 채운다 (.gitignore 대상). 저장소에 올리지 않는다.
+api_key           = "여기에_API_KEY"
+secret_key        = "여기에_SECRET_KEY"
+name_prefix       = "여기에_학번"
+shared_network_id = "여기에_Shared_Network_ID"
+# web_count       = 2
