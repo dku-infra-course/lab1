@@ -19,24 +19,19 @@
 
 | 폴더 | 용도 | 실습 단계 |
 |---|---|---|
-| `terraform/w9-iac/` | provider · variables · data · cloud-init 템플릿, 3-Tier 평면 코드(비교용) | Part A~D |
-| `terraform/w9-modules/` | web · cache · database 모듈과 호출 코드 | Part E~H, 14주차 복구 리허설 |
+| `terraform/w9-iac/` | 완성본(비교용). 막혔을 때 내 파일과 비교한다 | Part A~D |
+| `terraform/w9-modules/` | web · cache · database 모듈과 호출 코드 | Part E~H |
 
-작업 디렉터리는 가이드대로 `~/w9-iac`, `~/iac-modules`를 쓴다.
+9주차 Part A~D는 이 repo를 받지 않고, 빈 작업 디렉터리 `~/w9-iac`에서 `provider.tf`, `variables.tf`, `data.tf`, `terraform.tfvars`, `templates/cloud-init.tftpl`, `main.tf`, `outputs.tf`를 가이드를 보며 직접 만든다. `terraform/w9-iac/`의 파일은 같은 내용의 완성본이므로 틀린 곳을 찾을 때만 열어 비교한다.
+
+repo는 Part E1에서 처음 받는다.
 
 ```bash
 git clone https://github.com/dku-infra-course/lab1.git ~/lab1
-cd ~/lab1/terraform/w9-iac
-mkdir -p ~/w9-iac && cp -r provider.tf variables.tf data.tf templates terraform.tfvars.example .gitignore ~/w9-iac/
-```
-
-main.tf·outputs.tf 는 복사하지 않고 실습 C·D 에서 직접 작성한다(완성본은 비교용으로 repo 에 있다).
-
-모듈은 Part E1 에서 복사한다.
-
-```bash
 cp -r ~/lab1/terraform/w9-modules ~/iac-modules
 ```
+
+`~/lab1`이 이미 있다는 오류가 나면 `cd ~/lab1 && git pull`로 최신으로 맞춘 뒤 `cp`부터 다시 실행한다.
 
 ## 4. 주의
 
