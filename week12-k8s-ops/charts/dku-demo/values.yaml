@@ -1,0 +1,9 @@
+replicaCount: 2
+image:
+  repository: <DH_USER>/k8s-demo
+  tag: "1.0.0"
+containerPort: 8000
+service:
+  type: NodePort
+  port: 80
+  nodePort: 30090
