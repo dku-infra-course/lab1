@@ -30,6 +30,8 @@ mkdir -p ~/k8s-w11 && cp k8s/*.yaml ~/k8s-w11/ && cd ~/k8s-w11 && sed -i "s#<DH_
 
 ## 3. 작업 위치: 컨트롤 노드
 
+10주차 실습 VM이 남아 있으면 먼저 지운다(10주차에 VM을 만든 PC 폴더에서 `terraform destroy`). 계정 한도를 아끼고 이번 주부터는 VM 없이 진행하기 위해서다.
+
 11주차부터는 별도 실습 VM 없이 클러스터의 **컨트롤 노드에 SSH로 접속해 작업한다.** 클러스터는 `terraform/w11-k8s/README.md`로 만든다(본인 PC에서 Terraform 실행). 접속 후 아래를 한 번만 준비한다.
 
 ```bash
