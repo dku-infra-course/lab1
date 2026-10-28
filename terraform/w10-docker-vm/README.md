@@ -4,7 +4,7 @@
 
 10주차 실습 Part A의 VM 준비 방법이다(2026-10-22부터 Terraform으로 통일). Ubuntu 24.04 VM 1대(Medium, 2 vCPU / 4GB)를 만들고 cloud-init으로 `docker.io`, `docker-compose-v2`, `git`, `curl`을 설치하고 `ubuntu` 사용자를 `docker` 그룹에 넣는다. 가이드 A1에서 이 코드를 실행하고, A2에서 접속해 확인한다.
 
-쿼터: 학생 1인 동시 Medium 3대(6 vCPU / 12GB) 이내이며, 10주차가 끝나면 `terraform destroy`로 지운다. 11주차부터는 클러스터의 컨트롤 노드에서 작업한다(`week11-k8s/README.md` 참고).
+쿼터: 학생 1인 동시 Medium 3대(6 vCPU / 12GB) 이내이며, 11주차부터는 클러스터의 컨트롤 노드에서 작업하므로, 11주차를 시작하기 전에 `terraform destroy`로 지운다(`week11-k8s/README.md` 참고).
 
 ## 2. 파일
 
@@ -27,7 +27,7 @@ cloud-init status --wait                       # VM 안에서. done 이 나올 �
 exit                                           # 다시 로그인 (또는 newgrp docker)
 ssh ubuntu@$(terraform output -raw docker_vm_ip)
 docker run --rm hello-world
-terraform destroy                              # 10주차가 끝나면 지운다
+terraform destroy                              # 11주차를 시작하기 전에 지운다
 ```
 
 ## 4. 주의
