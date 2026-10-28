@@ -34,13 +34,13 @@ variable "kubernetes_version_name" {
 }
 
 variable "service_offering_name" {
-  description = "노드 컴퓨트 오퍼링 이름. 기본 Medium(2 vCPU / 4GB). 학생 계정은 Medium 3대(6 vCPU / 12GB)까지 동시에 쓸 수 있고, 실습 VM 1대와 클러스터 노드 2대가 그 3대다"
+  description = "노드 컴퓨트 오퍼링 이름. 기본 Medium(2 vCPU / 4GB). 학생 계정은 Medium 3대(6 vCPU / 12GB)까지 동시에 쓸 수 있고, 클러스터 노드 2대가 4 vCPU / 8GiB를 쓰고 2 vCPU / 4GiB가 남는다"
   type        = string
   default     = "Medium"
 }
 
 variable "worker_size" {
-  description = "워커 노드 수. 1로 둔다. 실습 VM(10주차) 1대 + control 1 + worker 1 = Medium 3대가 계정 동시 한도라서, 늘리면 한도를 넘어 생성이 실패하거나 멈춘다"
+  description = "워커 노드 수. 1로 둔다. control 1 + worker 1 = Medium 2대, 여기에 1대를 더하면 한도(Medium 3대)를 다 쓰기 때문에, 늘리면 한도를 넘어 생성이 실패하거나 멈춘다"
   type        = number
   default     = 1
 }
@@ -67,8 +67,13 @@ variable "node_root_disk_gb" {
   default     = 20
 }
 
-variable "keypair_name" {
-  description = "(선택) 콘솔에 미리 등록해 둔 SSH 키페어 이름. 노드에 SSH 로 들어갈 때만 필요하다. 비워 두면 키 없이 만든다. 등록하지 않은 이름을 주면 생성이 거부된다"
+variable "ssh_public_key_path" {
+  description = "노드에 넣을 SSH 공개키 파일 경로. 이 키로 컨트롤 노드에 cloud 계정으로 접속한다. 없으면 ssh-keygen -t ed25519 로 만든다"
   type        = string
-  default     = null
+  default     = "~/.ssh/id_ed25519.pub"
+
+  validation {
+    condition     = fileexists(pathexpand(var.ssh_public_key_path))
+    error_message = "공개키 파일이 없다. ssh-keygen -t ed25519 로 만든 뒤 경로를 확인한다(기본 ~/.ssh/id_ed25519.pub)."
+  }
 }
