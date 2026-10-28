@@ -34,13 +34,13 @@ variable "kubernetes_version_name" {
 }
 
 variable "service_offering_name" {
-  description = "노드 컴퓨트 오퍼링 이름. 기본 Medium(2 vCPU / 4GB). 학생 계정은 Medium 3대(6 vCPU / 12GB)까지 동시에 쓸 수 있고, 실습 VM 1대와 클러스터 노드 2대가 그 3대다"
+  description = "노드 컴퓨트 오퍼링 이름. 기본 Medium(2 vCPU / 4GB). 학생 계정은 Medium 3대(6 vCPU / 12GB)까지 동시에 쓸 수 있고, 클러스터 노드 2대가 4 vCPU / 8GiB를 쓰고 2 vCPU / 4GiB가 남는다"
   type        = string
   default     = "Medium"
 }
 
 variable "worker_size" {
-  description = "워커 노드 수. 1로 둔다. 실습 VM(10주차) 1대 + control 1 + worker 1 = Medium 3대가 계정 동시 한도라서, 늘리면 한도를 넘어 생성이 실패하거나 멈춘다"
+  description = "워커 노드 수. 1로 둔다. control 1 + worker 1 = Medium 2대, 여기에 1대를 더하면 한도(Medium 3대)를 다 쓰기 때문에, 늘리면 한도를 넘어 생성이 실패하거나 멈춘다"
   type        = number
   default     = 1
 }

@@ -21,7 +21,7 @@
 모든 YAML과 `values.yaml`의 `<DH_USER>`는 본인 Docker Hub 아이디로 바꾼다.
 
 ```bash
-git clone https://github.com/dku-infra-course/lab1.git ~/lab1 || git -C ~/lab1 pull   # 11주차에 받았으면 pull이 실행된다
+mkdir -p ~/lab1 && curl -fsSL https://github.com/dku-infra-course/lab1/archive/refs/heads/main.tar.gz | tar xz --strip-components=1 -C ~/lab1   # 컨트롤 노드에는 git이 없다. 11주차에 받았어도 다시 실행하면 최신으로 덮어쓴다
 mkdir -p ~/k8s-w12 && cp -r ~/lab1/week12-k8s-ops/{cfg,charts,hpa.yaml,ingress.yaml} ~/k8s-w12/
 cd ~/k8s-w12 && sed -i "s#<DH_USER>#$DH_USER#" hpa.yaml cfg/*.yaml charts/dku-demo/values.yaml
 ```
