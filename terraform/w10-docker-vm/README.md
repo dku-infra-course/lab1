@@ -4,7 +4,7 @@
 
 10주차 실습 Part A의 VM 준비 방법이다(2026-10-22부터 Terraform으로 통일). Ubuntu 24.04 VM 1대(Medium, 2 vCPU / 4GB)를 만들고 cloud-init으로 `docker.io`, `docker-compose-v2`, `git`, `curl`을 설치하고 `ubuntu` 사용자를 `docker` 그룹에 넣는다. 가이드 A1에서 이 코드를 실행하고, A2에서 접속해 확인한다.
 
-쿼터: 학생 1인 동시 Medium 3대(6 vCPU / 12GB) 이내이며, 이 VM은 11~14주차에도 kubectl·docker 작업용으로 재사용하므로 실습 중간에 지우지 않아도 된다.
+쿼터: 학생 1인 동시 Medium 3대(6 vCPU / 12GB) 이내이며, 이 VM은 11~14주차에도 kubectl·docker 작업용으로 재사용하므로 실습 중간에 지우지 않아도 된다. 지웠다면 11주차 시작 전에 같은 코드로 다시 만든다(`week11-k8s/README.md` 참고).
 
 ## 2. 파일
 
