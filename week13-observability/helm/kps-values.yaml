@@ -1,0 +1,40 @@
+# kube-prometheus-stack 최소 구성 (실습용)
+# helm install kps prometheus-community/kube-prometheus-stack -n monitoring --create-namespace -f kps-values.yaml
+#
+# - 영구 저장소 없이 띄운다(재시작하면 지표가 사라진다). 실습용이다.
+# - kubeadm 기본 설정에서는 etcd·scheduler·controller-manager·kube-proxy 지표 포트가 127.0.0.1에만 열려
+#   scrape가 실패하고 노이즈 알림이 생기므로 끈다.
+# - NodePort로 열어 VPN에서 직접 접속한다.
+
+fullnameOverride: kps
+
+kubeEtcd:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+kubeProxy:
+  enabled: false
+
+prometheus:
+  service:
+    type: NodePort
+    nodePort: 30900
+  prometheusSpec:
+    retention: 2d
+    resources:
+      requests:
+        cpu: 100m
+        memory: 400Mi
+
+alertmanager:
+  service:
+    type: NodePort
+    nodePort: 30903
+
+grafana:
+  adminPassword: dku-grafana   # 실습용 값. 운영에서는 Secret으로 주입한다
+  service:
+    type: NodePort
+    nodePort: 30300

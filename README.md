@@ -19,6 +19,7 @@
 | 10주차 | `week10-docker/` | `실습_W10_Docker컨테이너.html` | 이미지 빌드·푸시, 멀티스테이지, Compose, Trivy |
 | 11주차 | `week11-k8s/` | `실습_W11_K8s기본배포.html` | CKS 클러스터, Pod · Deployment · Service, 롤링 업데이트 |
 | 12주차 | `week12-k8s-ops/` | `실습_W12_K8s운영Helm.html` | Helm, ConfigMap · Secret, HPA |
+| 13주차 | `week13-observability/` | `실습_W13_K8s관측과SLO.html` | Prometheus · Grafana, SLO, 번레이트 알림 |
 
 `terraform/` 폴더에는 각 주차 실습 환경(VM·네트워크)을 만드는 Terraform 코드가 주차별로 들어 있다.
 `w1-environment` ~ `w5-cache`(1~5주차), `w9-iac` · `w9-modules`(9주차), `w10-docker-vm`(10주차, 선택), `w11-k8s`(11주차, 선택). Terraform을 처음 써 본다면 `terraform/README.md`를 먼저 읽는다.

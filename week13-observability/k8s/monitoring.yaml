@@ -1,0 +1,42 @@
+# ServiceMonitor: Prometheus가 shop Service의 /metrics 를 긁도록 알린다.
+# label release: kps 는 helm release 이름(kps)과 같아야 한다. 다르면 Prometheus가 무시한다.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: shop
+  labels:
+    release: kps
+spec:
+  selector:
+    matchLabels:
+      app: shop
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
+---
+# SLO: 30일 동안 요청의 99%가 성공(5xx가 아님). 오류 예산 = 1%.
+# 번레이트 10 = 예산을 10배 빠르게 쓰는 중 = 5분 오류율 10% 초과.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: shop-slo
+  labels:
+    release: kps
+spec:
+  groups:
+    - name: shop-slo
+      rules:
+        - record: shop:error_ratio:rate5m
+          expr: |
+            sum(rate(http_requests_total{code=~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total[5m]))
+        - alert: ShopErrorBudgetBurnHigh
+          expr: shop:error_ratio:rate5m > 10 * 0.01
+          for: 2m
+          labels:
+            severity: page
+          annotations:
+            summary: "shop 오류율이 SLO 예산 소진 속도의 10배를 넘었다"
+            action: "최근 배포를 확인하고 롤백 여부를 판단한다 (kubectl rollout history deploy/shop)"
