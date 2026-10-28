@@ -44,12 +44,18 @@ mkdir -p ~/.kube && sudo cp /etc/kubernetes/admin.conf ~/.kube/config
 sudo chown $(id -u):$(id -g) ~/.kube/config && chmod 600 ~/.kube/config
 kubectl get nodes
 
+# 선택: 별칭과 탭 자동완성. 이후 `kubectl` 대신 `k`를 쓸 수 있다
+echo 'source <(kubectl completion bash)' >> ~/.bashrc
+echo 'alias k=kubectl' >> ~/.bashrc
+echo 'complete -o default -F __start_kubectl k' >> ~/.bashrc
+source ~/.bashrc
+
 # docker: 이미지 빌드와 푸시에 쓴다. docker.io는 설치되지 않으므로 docker-ce를 쓴다
 sudo apt-get update; sudo apt-get install -y --no-install-recommends docker-ce docker-ce-cli containerd.io docker-buildx-plugin
 sudo /usr/sbin/usermod -aG docker cloud && exit
 ```
 
-다시 접속하면 `docker`가 `sudo` 없이 된다.
+다시 접속하면 `docker`가 `sudo` 없이 되고, 별칭 `k`와 탭 자동완성도 적용된다. 탭 자동완성이 동작하지 않으면 노드에 `bash-completion`이 없는 것이므로 별칭 `k`만 쓴다.
 
 - `~/.kube/config`는 클러스터 관리자 자격 증명이다. 커밋하거나 공유하지 않는다.
 - 컨트롤 노드 메모리는 4GiB다. 큰 이미지를 여러 개 빌드하지 않는다.
