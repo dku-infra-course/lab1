@@ -63,6 +63,19 @@ sudo /usr/sbin/usermod -aG docker cloud && exit
 - `apt-get update`는 오래된 저장소 오류를 내지만(`;`로 이어 둔 이유) 설치에는 영향이 없다.
 - 위 준비가 끝난 뒤 이 README의 "파일" 절 명령(`export DH_USER=...` 이하)을 **컨트롤 노드 안에서** 실행한다.
 
+### 패키지 설치가 `404 Not Found`로 실패할 때 (선택)
+
+컨트롤 노드는 Debian 11이고 지원이 끝났다. `sudo apt install vim` 같은 명령이 `E: Failed to fetch http://security.debian.org/... 404 Not Found`와 `bullseye-backports ... does not have a Release file`로 실패하면 저장소 주소를 보관소로 바꾼다. 실습 진행에는 필요 없고, 노드에 도구를 더 설치하고 싶을 때만 쓴다.
+
+```bash
+sudo sed -i -e 's#http://security.debian.org/debian-security#http://archive.debian.org/debian-security#' \
+            -e '/bullseye-backports/d' /etc/apt/sources.list /etc/apt/sources.list.d/*.list
+sudo apt-get update
+sudo apt-get install -y vim
+```
+
+`apt-get update`가 오류 없이 끝나면 된다. 이 설정은 Terraform으로 미리 넣을 수 없다(노드가 클러스터 서비스로 만들어지기 때문이다).
+
 ## 4. 주의
 
 - `kubeconfig`는 `chmod 600`으로 두고 커밋하지 않는다.
