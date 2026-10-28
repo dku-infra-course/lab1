@@ -1,0 +1,6 @@
+apiVersion: v2
+name: dku-demo
+description: W12 실습용 최소 차트 (Deployment + Service)
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
