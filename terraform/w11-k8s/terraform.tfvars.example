@@ -3,4 +3,4 @@ api_key           = "여기에_API_KEY"
 secret_key        = "여기에_SECRET_KEY"
 name_prefix       = "여기에_학번"
 shared_network_id = "여기에_Shared_Network_ID"
-# keypair_name    = "my-key"   # (선택) 미리 등록한 SSH 키페어
+# ssh_public_key_path = "~/.ssh/id_ed25519.pub"   # 기본값. 다른 키를 쓸 때만 바꾼다

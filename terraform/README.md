@@ -143,6 +143,6 @@ terraform destroy
 | `w9-iac/` | 9주차: Shared Network에 3-Tier VM 4대(web 2 · cache 1 · db 1, Small x3 + Medium x1). 평면 코드(비교용) |
 | `w9-modules/` | 9주차: 같은 구성을 web · cache · database 모듈로 나눈 코드. |
 | `w10-docker-vm/` | 10주차(선택): Docker 실습 VM 1대(Medium). |
-| `w11-k8s/` | 11주차(선택): CKS 클러스터(Medium, control 1 + worker 1). |
+| `w11-k8s/` | 11주차~: CKS 클러스터(Medium, control 1 + worker 1)와 SSH 키페어. 컨트롤 노드에서 kubectl·helm·docker를 쓴다. |
 
 각 폴더 안의 `README.md`에 그 주차의 변수 목록·전제 조건·실행 예시가 자세히 있다.
