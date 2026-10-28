@@ -28,22 +28,31 @@ mkdir -p ~/k8s-w11 && cp k8s/*.yaml ~/k8s-w11/ && cd ~/k8s-w11 && sed -i "s#<DH_
 
 클러스터를 코드로 만들고 싶으면 `terraform/w11-k8s/`(선택)를 쓴다. 이 환경의 CKS는 `type: LoadBalancer`의 EXTERNAL-IP가 `<pending>`으로 남으므로 NodePort를 쓴다.
 
-## 3. 실습 VM이 없다면
+## 3. 작업 위치: 컨트롤 노드
 
-이번 주 명령은 모두 10주차에 만든 실습 VM 안에서 실행한다. 10주차 VM을 지웠거나 새로 시작한다면 먼저 VM부터 다시 만든다. 이 코드는 본인 PC에서 실행하며, 9주차에 설치한 Terraform과 API 키를 쓴다.
+11주차부터는 별도 실습 VM 없이 클러스터의 **컨트롤 노드에 SSH로 접속해 작업한다.** 클러스터는 `terraform/w11-k8s/README.md`로 만든다(본인 PC에서 Terraform 실행). 접속 후 아래를 한 번만 준비한다.
 
 ```bash
-git clone https://github.com/dku-infra-course/lab1.git ~/lab1 || git -C ~/lab1 pull
-cd ~/lab1/terraform/w10-docker-vm
-cp terraform.tfvars.example terraform.tfvars   # api_key, secret_key, name_prefix, shared_network_id 입력
-terraform init && terraform apply
-terraform output next_steps                    # 접속과 cloud-init 대기 안내
+ssh cloud@<컨트롤 노드 IP>
+
+# kubectl: 노드에 v1.32.5가 있으나 PATH에 없어 다시 설치한다
+curl -LO "https://dl.k8s.io/release/v1.32.5/bin/linux/amd64/kubectl"
+sudo install -m 0755 kubectl /usr/local/bin/kubectl
+mkdir -p ~/.kube && sudo cp /etc/kubernetes/admin.conf ~/.kube/config
+sudo chown $(id -u):$(id -g) ~/.kube/config && chmod 600 ~/.kube/config
+kubectl get nodes
+
+# docker: 이미지 빌드와 푸시에 쓴다. docker.io는 설치되지 않으므로 docker-ce를 쓴다
+sudo apt-get install -y --no-install-recommends docker-ce docker-ce-cli containerd.io docker-buildx-plugin
+sudo usermod -aG docker cloud && exit
 ```
 
-- VM이 `Running`이 되고 `cloud-init status --wait`가 `done`을 보인 **뒤에** 클러스터를 만든다. VM과 클러스터를 같은 시점에 요청하지 않는다.
-- 새 VM에는 `docker login`이 되어 있지 않다. Part D(D4)와 Part F에서 이미지를 푸시하기 전에 `docker login -u $DH_USER`를 다시 한다.
-- Docker Hub에 올려 둔 `$DH_USER/k8s-demo:1.0.0`과 내 앱 이미지는 그대로 쓴다. 다시 빌드하지 않아도 된다.
-- 위 VM 단계가 끝난 뒤 이 README의 "파일" 절 명령(`export DH_USER=...` 이하)을 **VM 안에서** 실행한다.
+다시 접속하면 `docker`가 `sudo` 없이 된다.
+
+- `~/.kube/config`는 클러스터 관리자 자격 증명이다. 커밋하거나 공유하지 않는다.
+- 컨트롤 노드 메모리는 4GiB다. 큰 이미지를 여러 개 빌드하지 않는다.
+- Part D(D4)와 Part F에서 이미지를 푸시하기 전에 `docker login -u $DH_USER`를 한다.
+- 위 준비가 끝난 뒤 이 README의 "파일" 절 명령(`export DH_USER=...` 이하)을 **컨트롤 노드 안에서** 실행한다.
 
 ## 4. 주의
 

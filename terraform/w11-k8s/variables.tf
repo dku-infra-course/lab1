@@ -67,8 +67,13 @@ variable "node_root_disk_gb" {
   default     = 20
 }
 
-variable "keypair_name" {
-  description = "(선택) 콘솔에 미리 등록해 둔 SSH 키페어 이름. 노드에 SSH 로 들어갈 때만 필요하다. 비워 두면 키 없이 만든다. 등록하지 않은 이름을 주면 생성이 거부된다"
+variable "ssh_public_key_path" {
+  description = "노드에 넣을 SSH 공개키 파일 경로. 이 키로 컨트롤 노드에 cloud 계정으로 접속한다. 없으면 ssh-keygen -t ed25519 로 만든다"
   type        = string
-  default     = null
+  default     = "~/.ssh/id_ed25519.pub"
+
+  validation {
+    condition     = fileexists(pathexpand(var.ssh_public_key_path))
+    error_message = "공개키 파일이 없다. ssh-keygen -t ed25519 로 만든 뒤 경로를 확인한다(기본 ~/.ssh/id_ed25519.pub)."
+  }
 }
