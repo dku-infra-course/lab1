@@ -20,7 +20,7 @@
 학생이 직접 쓰는 것: `my-alert.yaml`(알림 규칙 1개), SLO 표(`final/observability/slo.md`로 이어진다).
 
 ```bash
-git clone https://github.com/dku-infra-course/lab1.git ~/lab1
+mkdir -p ~/lab1 && curl -fsSL https://github.com/dku-infra-course/lab1/archive/refs/heads/main.tar.gz | tar xz --strip-components=1 -C ~/lab1   # 컨트롤 노드에는 git이 없다
 cd ~/lab1/week13-observability
 mkdir -p ~/k8s-w13 && cp -r . ~/k8s-w13 && cd ~/k8s-w13 && ls
 ```
