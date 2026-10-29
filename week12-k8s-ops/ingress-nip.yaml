@@ -1,0 +1,21 @@
+# 방법 B: hosts 파일을 고치지 않는 임시 도메인(nip.io).
+# <NODE_IP>는 적용할 때 치환한다:
+#   sed "s#<NODE_IP>#$NODE_IP#" ingress-nip.yaml | kubectl apply -f -
+# 같은 이름(demo)의 Ingress를 덮어쓰므로 방법 A와 B 중 하나만 적용된다.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: demo
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: demo.<NODE_IP>.nip.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  number: 80
