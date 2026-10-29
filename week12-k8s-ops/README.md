@@ -16,13 +16,14 @@
 | `cfg/configmap.yaml` | ConfigMap `app-config` (APP_VERSION · APP_MODE) | C1 |
 | `cfg/cfg-demo.yaml` | Deployment + Service(NodePort 30091) **뼈대**. `envFrom`·`env`는 직접 쓴다 | C2 |
 | `hpa.yaml` | Deployment `hpa-demo`(requests 20m) + Service + HPA(CPU 50%, 1~4) | D2 |
-| `ingress.yaml` | Ingress 예제(Part B의 release Service `web`으로 전달). 컨트롤러 설치는 선택 Part E | E2 |
+| `ingress.yaml` | Ingress 예제, 호스트 `demo.test`(방법 A: PC hosts 파일에 한 줄 추가). Part B의 release Service `web`으로 전달. 컨트롤러 설치는 선택 Part E | E2 |
+| `ingress-nip.yaml` | 같은 Ingress를 nip.io 임시 도메인으로 쓰는 방법 B. `<NODE_IP>`를 치환해 적용하며 `ingress.yaml`과 같은 이름을 덮어쓴다 | E2 |
 
 모든 YAML과 `values.yaml`의 `<DH_USER>`는 본인 Docker Hub 아이디로 바꾼다.
 
 ```bash
 mkdir -p ~/lab1 && curl -fsSL https://github.com/dku-infra-course/lab1/archive/refs/heads/main.tar.gz | tar xz --strip-components=1 -C ~/lab1   # 컨트롤 노드에는 git이 없다. 11주차에 받았어도 다시 실행하면 최신으로 덮어쓴다
-mkdir -p ~/k8s-w12 && cp -r ~/lab1/week12-k8s-ops/{cfg,charts,hpa.yaml,ingress.yaml} ~/k8s-w12/
+mkdir -p ~/k8s-w12 && cp -r ~/lab1/week12-k8s-ops/{cfg,charts,hpa.yaml,ingress.yaml,ingress-nip.yaml} ~/k8s-w12/
 cd ~/k8s-w12 && sed -i "s#<DH_USER>#$DH_USER#" hpa.yaml cfg/*.yaml charts/dku-demo/values.yaml
 ```
 

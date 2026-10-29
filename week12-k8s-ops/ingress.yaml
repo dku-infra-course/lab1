@@ -5,7 +5,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: demo.local
+    - host: demo.test          # 방법 A: PC의 hosts 파일에 "<INTERNAL-IP> demo.test" 한 줄을 추가한다
       http:
         paths:
           - path: /
