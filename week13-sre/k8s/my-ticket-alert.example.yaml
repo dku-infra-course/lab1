@@ -1,6 +1,11 @@
-# ticket 알림 - 학생 과제
-# 조건: p95(latency_p95:seconds_rate5m 기록 규칙) > 0.5초 이상 3분 지속 → ticket 알림 발송
-# 사용법: 이 파일을 my-ticket-alert.yaml로 복사하고 kubectl apply -f 한다.
+# Prometheus ticket 알림 규칙
+# 조건: p95(기록 규칙 sre:sli_latency_p95:seconds_rate5m) > 0.5초 이상 3분 지속
+# 용도: 긴급하지 않은 알림(ticket) - 사람을 깨우지 않음
+#
+# 사용법:
+#   1. 이 파일을 my-ticket-alert.yaml로 복사
+#   2. kubectl apply -f k8s/my-ticket-alert.yaml
+#   3. Prometheus Alerts 탭에서 PodinfoLatencyP95High 확인
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -11,15 +16,25 @@ spec:
     - name: my-ticket
       rules:
         - alert: PodinfoLatencyP95High
-          # C1에서 적용한 기록 규칙(sre:sli_latency_p95:seconds_rate5m)이 0.5초 초과하면 알림
+          # expr: C1에서 만든 기록 규칙(sre:sli_latency_p95:seconds_rate5m)이 0.5초 초과하면 조건 만족
+          # 왜 0.5?: SLO 목표가 p95 < 500ms(0.5초)이므로 임계값으로 설정
           expr: sre:sli_latency_p95:seconds_rate5m > 0.5
-          # 3분 이상 지속되는 경우만 알림 (일시적 튐 무시)
+
+          # for: 3분 이상 지속될 때만 알림 발송
+          # 왜 3분?: 일시적인 성능 저하(예: 1초짜리 튐)는 무시하고,
+          #         지속적인 문제만 감지하기 위함 (실무는 1시간·5분 창 사용)
           for: 3m
+
           labels:
-            # ticket: 사람을 깨우지 않는 알림 (page와 구분)
+            # severity: page(긴급·사람 깨움) vs ticket(일반·기록만)
+            # ticket을 선택하면 Alertmanager가 ticket 채널로 라우팅
             severity: ticket
+
           annotations:
-            # 알림 화면에 표시될 제목
+            # summary: Alertmanager 화면과 알림에 표시되는 제목
             summary: "Podinfo p95 > 500ms"
-            # 알림 화면에 표시될 상세 메시지 ({{ $value }}는 현재 값)
+
+            # description: 알림 상세 메시지
+            # {{ $value }}: expr 결과값(현재 p95·초) 자동 삽입
+            # 예) p95가 0.75초면 "Current p95: 0.75s. ..."로 표시됨
             description: "Current p95: {{ $value }}s. Check dashboard B2 p95 panel."
