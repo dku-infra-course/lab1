@@ -1,7 +1,0 @@
-# 실측 전
-# 이 파일을 terraform.tfvars로 복사해 값을 채운다. terraform.tfvars는 저장소에 올리지 않는다.
-api_key           = "<YOUR_API_KEY>"
-secret_key        = "<YOUR_SECRET_KEY>"
-name_prefix       = "<YOUR_STUDENT_ID>"
-shared_network_id = "<YOUR_SHARED_NETWORK_ID>"
-worker_count      = 1

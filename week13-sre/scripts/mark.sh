@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 실측 전
 # 장애 대응 4개 시각을 timeline.csv에 기록한다.
-# 사용: mark.sh 주입|감지|완화|복구 [메모]
+# 컨트롤 노드에서 실행한다. 사용: mark.sh 주입|감지|완화|복구 [메모]
 set -euo pipefail
 
 LABEL="${1:-}"
