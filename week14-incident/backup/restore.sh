@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # 실측 전
-# 본인 PC에서 실행한다. 새 DB VM에 백업을 올려 복원하고 sha256, 행 수, 데이터 해시를 검증한다.
+# 본인 PC에서 실행한다(DB VM에 SSH가 되는 곳). 새 DB VM에 백업을 올려 복원하고 sha256, 행 수, 데이터 해시를 검증한다.
 # 사용: ./restore.sh <새_db_ip> <백업 파일 경로(.sql.gz)>
 # 같은 위치에 .sha256, .meta 파일이 있어야 한다.
 set -euo pipefail

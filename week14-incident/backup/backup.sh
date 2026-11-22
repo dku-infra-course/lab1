@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # 실측 전
-# 본인 PC에서 실행한다. DB VM에서 덤프를 만들고 PC로 사본(오프사이트)을 가져온 뒤 sha256으로 검증한다.
+# 본인 PC에서 실행한다(컨트롤 노드가 아니다. DB VM에 SSH가 되는 곳이고 PC의 사본이 오프사이트 사본이다). DB VM에서 덤프를 만들고 PC로 사본(오프사이트)을 가져온 뒤 sha256으로 검증한다.
 # 사용: ./backup.sh <db_ip> [저장 디렉터리, 기본 ~/dr-backup]
 # 출력 파일: dku-<UTC시각>.sql.gz, .sha256, .meta(행 수와 데이터 해시, 마지막 행 시각)
 set -euo pipefail

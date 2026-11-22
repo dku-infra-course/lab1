@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 실측 전
 # frontend Pod 하나에만 fault_injection을 켜고 끈다. 사용: fault.sh enable|disable|status
-# podinfo 이미지에는 curl이 없으므로 로컬에서 kubectl port-forward 후 curl을 쓴다.
+# 컨트롤 노드에서 실행한다. podinfo 이미지에는 curl이 없으므로 컨트롤 노드 로컬에서 kubectl port-forward(19898) 후 curl을 쓴다.
 set -euo pipefail
 
 NS="${NS:-sre-lab}"
