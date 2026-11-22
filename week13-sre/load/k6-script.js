@@ -1,7 +1,7 @@
-// 실측 전
-// 3단계 부하: 10 -> 30 -> 60 VU. 단계마다 10초 진입 + 60초 유지, 마지막 10초 종료(총 약 3분 40초).
-// STAGES=short 이면 30 -> 60 VU만 실행한다(총 약 2분 30초). 기본값은 전체 3단계.
-// 요청 구성: GET / (70%), POST /echo (25%, frontend가 backend로 전달), backend /cache (5%, Redis)
+// 단계 부하 테스트 (촬영/데모 최적화)
+// 3단계 부하: 10 → 30 → 60 VU. 단계마다 5초 진입 + 30초 유지, 5초 종료 (총 약 1분 50초)
+// STAGES=short 이면 30 → 60 VU만 실행 (총 약 1분 10초)
+// 요청 구성: GET / (70%), POST /echo (25%, frontend→backend), /cache (5%, Redis)
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
@@ -10,20 +10,20 @@ const BACK = __ENV.BACK_URL || 'http://backend-podinfo.sre-lab:9898';
 const SHORT = __ENV.STAGES === 'short';
 
 const FULL_STAGES = [
-  { duration: '10s', target: 10 }, // 단계 1 진입
-  { duration: '60s', target: 10 }, // 단계 1 유지: 10 VU
-  { duration: '10s', target: 30 },
-  { duration: '60s', target: 30 }, // 단계 2 유지: 30 VU
-  { duration: '10s', target: 60 },
-  { duration: '60s', target: 60 }, // 단계 3 유지: 60 VU
-  { duration: '10s', target: 0 },
+  { duration: '5s', target: 10 },   // 단계 1 진입
+  { duration: '30s', target: 10 },  // 단계 1 유지: 10 VU
+  { duration: '5s', target: 30 },
+  { duration: '30s', target: 30 },  // 단계 2 유지: 30 VU
+  { duration: '5s', target: 60 },
+  { duration: '30s', target: 60 },  // 단계 3 유지: 60 VU
+  { duration: '5s', target: 0 },
 ];
 const SHORT_STAGES = [
-  { duration: '10s', target: 30 },
-  { duration: '60s', target: 30 },
-  { duration: '10s', target: 60 },
-  { duration: '60s', target: 60 },
-  { duration: '10s', target: 0 },
+  { duration: '5s', target: 30 },
+  { duration: '30s', target: 30 },
+  { duration: '5s', target: 60 },
+  { duration: '30s', target: 60 },
+  { duration: '5s', target: 0 },
 ];
 
 export const options = {
