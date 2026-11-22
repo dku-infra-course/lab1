@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(kubectl get *)",
+      "Bash(kubectl describe *)",
+      "Bash(kubectl logs *)",
+      "Bash(kubectl rollout status *)",
+      "Bash(kubectl rollout history *)",
+      "Bash(kubectl auth can-i *)",
+      "Bash(curl -s -G http://<NODE_IP>:30090/api/v1/*)"
+    ],
+    "ask": [
+      "Bash(kubectl rollout undo *)"
+    ],
+    "deny": [
+      "Bash(kubectl delete *)",
+      "Bash(kubectl apply *)",
+      "Bash(kubectl edit *)",
+      "Bash(kubectl exec *)",
+      "Bash(kubectl patch *)",
+      "Bash(kubectl scale *)",
+      "Bash(kubectl config *)",
+      "Bash(kubectl get secret *)",
+      "Bash(kubectl get secrets *)",
+      "Bash(cat *kube*)",
+      "Bash(printenv *)",
+      "Bash(env)",
+      "Read(**/*.tfvars)",
+      "Read(**/*.tfstate)",
+      "Read(**/*.tfstate.backup)",
+      "Read(**/.kube/**)",
+      "Read(**/*kubeconfig*)",
+      "Read(**/.env)"
+    ]
+  }
+}

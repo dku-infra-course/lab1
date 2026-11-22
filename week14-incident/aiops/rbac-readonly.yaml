@@ -1,0 +1,40 @@
+# 실측 전
+# AI 에이전트용 읽기 전용 계정. secrets, configmaps, exec 권한은 주지 않는다.
+# 적용: kubectl apply -f rbac-readonly.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ai-reader
+  namespace: sre-lab
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ai-reader-readonly
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "events", "services", "endpoints", "nodes", "namespaces"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["discovery.k8s.io"]
+    resources: ["endpointslices"]
+    verbs: ["get", "list", "watch"]
+  # kubectl top 용. Solid Cloud 클러스터에는 metrics-server가 없어 쓰이지 않는다(Metrics API 없음). 있는 환경을 위한 규칙이다
+  - apiGroups: ["metrics.k8s.io"]
+    resources: ["pods", "nodes"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ai-reader-readonly
+subjects:
+  - kind: ServiceAccount
+    name: ai-reader
+    namespace: sre-lab
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ai-reader-readonly

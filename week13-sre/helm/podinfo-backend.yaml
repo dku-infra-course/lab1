@@ -1,0 +1,22 @@
+# 실측 전
+# podinfo backend (Redis 포함). 설치:
+#   helm repo add podinfo https://stefanprodan.github.io/podinfo
+#   helm install backend podinfo/podinfo -n sre-lab --create-namespace -f podinfo-backend.yaml
+# 서비스 이름은 backend-podinfo(포트 9898)가 된다.
+replicaCount: 1
+
+redis:
+  enabled: true
+
+serviceMonitor:
+  enabled: true
+  interval: 15s
+
+resources:
+  requests:
+    cpu: 20m
+    memory: 32Mi
+  limits:
+    # 실습 D 병목용, D3에서 올린다
+    cpu: 30m
+    memory: 128Mi

@@ -1,0 +1,95 @@
+# 실측 전
+# 실행: kubectl apply -f k6-job.yaml ; kubectl -n sre-lab logs -f job/k6-load
+# 짧은 실행(30 -> 60 VU, 약 2분 30초): sed 's/value: "full"/value: "short"/' k6-job.yaml | kubectl apply -f -
+# 재실행: kubectl -n sre-lab delete job k6-load 후 다시 apply (스크립트 수정은 ConfigMap 반영 후)
+# 스크립트 원본은 k6-script.js. 이 ConfigMap과 내용을 같게 유지한다.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k6-script
+  namespace: sre-lab
+data:
+  script.js: |
+    import http from 'k6/http';
+    import { check, sleep } from 'k6';
+
+    const FRONT = __ENV.FRONT_URL || 'http://frontend-podinfo.sre-lab:9898';
+    const BACK = __ENV.BACK_URL || 'http://backend-podinfo.sre-lab:9898';
+    const SHORT = __ENV.STAGES === 'short';
+
+    const FULL_STAGES = [
+      { duration: '10s', target: 10 },
+      { duration: '60s', target: 10 },
+      { duration: '10s', target: 30 },
+      { duration: '60s', target: 30 },
+      { duration: '10s', target: 60 },
+      { duration: '60s', target: 60 },
+      { duration: '10s', target: 0 },
+    ];
+    const SHORT_STAGES = [
+      { duration: '10s', target: 30 },
+      { duration: '60s', target: 30 },
+      { duration: '10s', target: 60 },
+      { duration: '60s', target: 60 },
+      { duration: '10s', target: 0 },
+    ];
+
+    export const options = {
+      stages: SHORT ? SHORT_STAGES : FULL_STAGES,
+      thresholds: {
+        http_req_failed: ['rate<0.01'],
+        http_req_duration: ['p(95)<500'],
+      },
+      summaryTrendStats: ['avg', 'min', 'med', 'p(90)', 'p(95)', 'p(99)', 'max'],
+    };
+
+    export default function () {
+      const r = Math.random();
+      let res;
+      if (r < 0.70) {
+        res = http.get(`${FRONT}/`);
+      } else if (r < 0.95) {
+        res = http.post(`${FRONT}/echo`, JSON.stringify({ t: Date.now() }), {
+          headers: { 'Content-Type': 'application/json' },
+        });
+      } else {
+        const key = `k${__VU}`;
+        http.post(`${BACK}/cache/${key}`, 'v');
+        res = http.get(`${BACK}/cache/${key}`);
+      }
+      check(res, { 'status 200': (x) => x.status === 200 });
+      sleep(0.1);
+    }
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: k6-load
+  namespace: sre-lab
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 3600
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: k6
+          image: grafana/k6:latest
+          args: ["run", "/scripts/script.js"]
+          env:
+            - name: STAGES
+              value: "full"   # short 이면 30 -> 60 VU만 실행한다
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          volumeMounts:
+            - name: script
+              mountPath: /scripts
+      volumes:
+        - name: script
+          configMap:
+            name: k6-script

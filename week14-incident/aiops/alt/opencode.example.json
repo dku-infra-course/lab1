@@ -1,0 +1,35 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permissions": [
+    { "action": "shell", "resource": "*", "effect": "deny" },
+
+    { "action": "shell", "resource": "kubectl get *", "effect": "allow" },
+    { "action": "shell", "resource": "kubectl describe *", "effect": "allow" },
+    { "action": "shell", "resource": "kubectl logs *", "effect": "allow" },
+    { "action": "shell", "resource": "kubectl rollout status *", "effect": "allow" },
+    { "action": "shell", "resource": "kubectl rollout history *", "effect": "allow" },
+    { "action": "shell", "resource": "kubectl auth can-i *", "effect": "allow" },
+    { "action": "shell", "resource": "curl -s -G http://<NODE_IP>:30090/api/v1/*", "effect": "allow" },
+
+    { "action": "shell", "resource": "kubectl rollout undo *", "effect": "ask" },
+
+    { "action": "shell", "resource": "kubectl delete *", "effect": "deny" },
+    { "action": "shell", "resource": "kubectl apply *", "effect": "deny" },
+    { "action": "shell", "resource": "kubectl edit *", "effect": "deny" },
+    { "action": "shell", "resource": "kubectl exec *", "effect": "deny" },
+    { "action": "shell", "resource": "kubectl patch *", "effect": "deny" },
+    { "action": "shell", "resource": "kubectl scale *", "effect": "deny" },
+    { "action": "shell", "resource": "kubectl config *", "effect": "deny" },
+    { "action": "shell", "resource": "kubectl get secret *", "effect": "deny" },
+    { "action": "shell", "resource": "kubectl get secrets *", "effect": "deny" },
+
+    { "action": "read", "resource": "*kubeconfig*", "effect": "deny" },
+    { "action": "read", "resource": "*/.kube/*", "effect": "deny" },
+    { "action": "read", "resource": "*.tfvars", "effect": "deny" },
+    { "action": "read", "resource": "*.tfstate", "effect": "deny" },
+    { "action": "read", "resource": "*.tfstate.backup", "effect": "deny" },
+    { "action": "read", "resource": "*.env", "effect": "deny" },
+
+    { "action": "edit", "resource": "*", "effect": "deny" }
+  ]
+}
