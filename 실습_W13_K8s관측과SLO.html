@@ -332,14 +332,14 @@ helm upgrade backend podinfo/podinfo -n sre-lab -f helm/podinfo-backend.yaml
 kubectl -n sre-lab rollout status deploy/backend-podinfo</pre>
 <div class="chk"><b>확인 기준 (읽는 기준이며 할 일이 아니다)</b><ul><li><code>limits</code>의 cpu가 <code>200m</code>이고 rollout이 완료되면 통과. (<code>requests</code>의 20m은 그대로 둔다.)</li></ul></div>
 </div>
-<div class="step"><span class="n">D4</span><h3>짧은 모드로 재측정과 전후 비교 · 6분<span class="must">필수</span></h3>
-<ul><li>같은 Job을 짧은 모드로 다시 건다. 30 VU와 60 VU만 실행하며 약 2분 30초다.</li><li>실행하는 동안 E1의 가설과 명령을 미리 읽어 둔다.</li></ul>
+<div class="step"><span class="n">D4</span><h3>D3 수정 검증 · 짧은 모드 재측정 · 4분<span class="must">필수</span></h3>
+<h3>목표</h3><p><b>D3에서 backend CPU를 30m → 200m으로 수정했다.</b> 이제 그 수정이 실제로 작동했는지 확인한다.<br>짧은 모드(30/60 VU만, 약 1분 10초)로 빠르게 재측정해 D1의 결과와 비교한다.</p><p><b>수정이 성공했는지 보는 기준:</b></p><ul><li>D1의 p(95) → D4의 p(95): 훨씬 낮아졌는가?</li><li>D1의 backend 스로틀링 → D4의 스로틀링: 0%가 되었는가?</li><li>D1 대비 처리량: 증가했는가?</li><li>모든 임계값이 여전히 통과하는가?</li></ul>
 <pre>kubectl -n sre-lab delete job k6-load --ignore-not-found
 sed 's/value: "full"/value: "short"/' load/k6-job.yaml | kubectl apply -f -
 kubectl -n sre-lab logs -f job/k6-load</pre>
-<p><code>sed</code>는 파일 안의 <code>STAGES</code> 값만 <code>short</code>로 바꿔 적용한다. 파일은 그대로다. 읽는 시점은 D1과 같은 방식이며 30 VU는 40초 ~ 1분 10초, 60 VU는 1분 50초 ~ 2분 20초다.</p>
-<div class="chk"><b>확인 기준 (읽는 기준이며 할 일이 아니다)</b><ul><li>p95와 스로틀링이 수정 전보다 낮으면 통과. 아니면 다음 병목의 근거를 생각해 본다.</li></ul></div>
-<table><tr><th>항목</th><th>참고값(강사 실측)</th><th>내 결과와 비교할 점</th></tr><tr><td>30 VU: p95 / 에러율 / backend 스로틀링</td><td>5ms 이하 / 0% / 0%</td><td>D1의 같은 단계와 비교한다. 스로틀링이 사라졌는지 본다.</td></tr><tr><td>60 VU: p95 / 에러율 / backend 스로틀링</td><td>5ms 이하 / 0% / 0%</td><td>D1의 60 VU(약 147ms, 스로틀링 약 87%)보다 낮아졌는지 본다. 같은 시간에 처리한 요청 수도 늘어난다.</td></tr><tr><td>k6 요약 임계값</td><td>통과</td><td>실패하면 다음 병목을 찾는다. 예: frontend CPU.</td></tr></table><p class="muted">(강사 실측, Solid Cloud, 2026-11-22) 환경에 따라 달라지며, 내 결과가 크게 다르면 원인을 생각해 본다.</p><p class="muted">내 값은 본인 노트에 메모해 두었다가 최종 과제 보고서에 쓴다.</p>
+<p><code>sed</code>는 STAGES 값만 <code>short</code>로 바꿔 적용한다(파일은 수정 안 됨). 각 VU 단계의 읽는 시점은 D1과 같다.</p>
+<div class="chk"><b>확인 기준 (읽는 기준이며 할 일이 아니다)</b><ul><li>k6 로그에서 p(95)가 D1(약 198ms)보다 훨씬 낮고 ✓ THRESHOLDS가 보이면 통과.</li></ul></div>
+<table><tr><th>항목</th><th>참고값(강사 실측)</th><th>내 결과와 비교할 점</th></tr><tr><td>D1 (backend 30m): p95 / 에러율 / 스로틀링</td><td>198ms / 0% / 약 70~90%</td><td>baseline (병목 상태)</td></tr><tr><td>D4 (backend 200m): p95 / 에러율 / 스로틀링</td><td>약 3~5ms / 0% / 0%</td><td>수정 후 (병목 해결)</td></tr><tr><td>개선율</td><td>약 40~60배 개선</td><td>CPU 제한이 진짜 병목이었다 (가설 검증 완료)</td></tr></table><p class="muted">(강사 실측, Solid Cloud, 2026-11-22) 환경에 따라 달라지며, 내 결과가 크게 다르면 원인을 생각해 본다.</p><p class="muted">내 값은 본인 노트에 메모해 두었다가 최종 과제 보고서에 쓴다.</p>
 <div class="note">E로 넘어가기 전에 <code>kubectl -n sre-lab get job</code>으로 Job 종료를 확인한다.</div>
 </div>
 <h3>막혔을 때</h3><table><tr><th>증상</th><th>조치</th></tr><tr><td>k6 Pod가 <code>Pending</code></td><td>요청 CPU 100m를 배치할 수 없다. <code>describe pod</code>로 확인하고 잔여물을 정리한다.</td></tr><tr><td><code>delete job</code> 후에도 같은 Job이 남는다</td><td>삭제에 몇 초 걸린다. <code>get job</code>이 빈 뒤 apply한다.</td></tr><tr><td>k6 Pod가 <code>ImagePullBackOff</code></td><td><code>grafana/k6</code> 이미지를 받지 못한 것이다. 1분 뒤 재확인하고 <code>describe pod</code> Events를 첨부해 질문한다.</td></tr><tr><td>스로틀링 패널이 비어 있다</td><td>Pod 이름이 바뀌었을 수 있다. 시간 범위를 줄이고 pod 범례를 본다.</td></tr><tr><td>RPS가 올라가지 않는다</td><td>k6 Pod가 limit(500m)에 걸렸다. 로그의 <code>dropped_iterations</code>를 본다.</td></tr></table>
