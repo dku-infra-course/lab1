@@ -1,7 +1,6 @@
-# 실측 전
-# 학생 과제: p95 지연 시간 ticket 알림 1개를 작성한다.
-# 이 파일을 my-ticket-alert.yaml로 복사해 TODO를 채운 뒤 kubectl apply -f 한다.
-# 힌트: 기록 규칙 sre:sli_latency_p95:seconds_rate5m(단위 초)을 쓰면 식이 짧아진다.
+# ticket 알림 - 학생 과제
+# 조건: p95(latency_p95:seconds_rate5m 기록 규칙) > 0.5초 이상 3분 지속 → ticket 알림 발송
+# 사용법: 이 파일을 my-ticket-alert.yaml로 복사하고 kubectl apply -f 한다.
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -12,13 +11,15 @@ spec:
     - name: my-ticket
       rules:
         - alert: PodinfoLatencyP95High
-          # TODO 1: p95가 SLO 목표(예: 0.5초)를 넘으면 참이 되는 PromQL을 쓴다
-          expr: "TODO"
-          # TODO 2: 일시적인 튐은 무시하도록 지속 시간을 정한다 (예: 10m)
-          for: "TODO"
+          # C1에서 적용한 기록 규칙(sre:sli_latency_p95:seconds_rate5m)이 0.5초 초과하면 알림
+          expr: sre:sli_latency_p95:seconds_rate5m > 0.5
+          # 3분 이상 지속되는 경우만 알림 (일시적 튐 무시)
+          for: 3m
           labels:
-            # ticket은 사람을 깨우지 않는다. page와 구분되는 값을 쓴다
+            # ticket: 사람을 깨우지 않는 알림 (page와 구분)
             severity: ticket
           annotations:
-            summary: "TODO: 한 줄 요약"
-            description: "TODO: 현재 값과 확인할 대시보드 위치"
+            # 알림 화면에 표시될 제목
+            summary: "Podinfo p95 > 500ms"
+            # 알림 화면에 표시될 상세 메시지 ({{ $value }}는 현재 값)
+            description: "Current p95: {{ $value }}s. Check dashboard B2 p95 panel."
