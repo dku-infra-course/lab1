@@ -1,0 +1,12 @@
+# ~/.codex/config.toml 에 복사해 쓴다. 프로젝트 안 .codex/config.toml 은 신뢰한 프로젝트에서만 읽힌다.
+# 출처: https://learn.chatgpt.com/docs/config-file/config-basic (2026-11-22 확인)
+
+# 파일 쓰기와 네트워크를 막는 읽기 전용 샌드박스
+sandbox_mode = "read-only"
+
+# 샌드박스 밖 실행이 필요하면 사람에게 묻는다
+approval_policy = "on-request"
+
+# kubectl 명령별 allow, prompt, forbidden 은 codex-kubectl.rules.example 을
+# ~/.codex/rules/default.rules 로 복사해 정한다.
+# kubeconfig, tfvars 읽기 차단 문법은 공식 문서 확인 (permissions 프로필, 이번에 미확인).

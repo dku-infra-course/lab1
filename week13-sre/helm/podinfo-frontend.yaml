@@ -1,0 +1,23 @@
+# 실측 전
+# podinfo frontend. 설치:
+#   helm install frontend podinfo/podinfo -n sre-lab -f podinfo-frontend.yaml
+replicaCount: 2
+
+# /echo 요청을 backend로 전달한다 (서비스 이름: backend-podinfo)
+backend: http://backend-podinfo.sre-lab:9898/echo
+
+service:
+  type: NodePort
+  nodePort: 30980
+
+serviceMonitor:
+  enabled: true
+  interval: 15s
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 32Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi

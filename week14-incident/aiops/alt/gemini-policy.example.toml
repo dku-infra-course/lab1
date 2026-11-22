@@ -1,0 +1,25 @@
+# ~/.gemini/policies/aiops.toml 로 복사한다(사용자 계층). 프로젝트 .gemini/policies 는 문서상 현재 동작하지 않는다.
+# 출처: https://github.com/google-gemini/gemini-cli/blob/main/docs/reference/policy-engine.md (2026-11-22 확인)
+# priority 가 높은 규칙이 이긴다. 비대화형(-p)에서 ask_user 는 deny 로 처리된다.
+# 이 도구는 개인 무료 이용이 2026-06-18에 종료되었다. 기업 Code Assist 또는 유료 키가 있을 때만 쓴다.
+
+[[rule]]
+toolName = "run_shell_command"
+commandPrefix = ["kubectl get", "kubectl describe", "kubectl logs", "kubectl rollout status", "kubectl rollout history"]
+decision = "allow"
+priority = 100
+
+[[rule]]
+toolName = "run_shell_command"
+commandPrefix = "kubectl rollout undo"
+decision = "ask_user"
+priority = 150
+
+[[rule]]
+toolName = "run_shell_command"
+commandPrefix = ["kubectl delete", "kubectl apply", "kubectl edit", "kubectl exec", "kubectl patch", "kubectl scale", "kubectl config", "kubectl get secret"]
+decision = "deny"
+priority = 200
+denyMessage = "변경 명령과 Secret 조회는 사람이 직접 한다"
+
+# kubeconfig, tfvars 읽기 차단: read_file 의 argsPattern 키 이름은 Tools reference 에서 공식 문서 확인.

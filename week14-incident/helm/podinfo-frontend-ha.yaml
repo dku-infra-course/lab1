@@ -1,0 +1,36 @@
+# 실측 전
+# frontend 가용성 개선(SPOF 제거). 13주차 podinfo-frontend.yaml에 두 항목을 더한 값이다.
+#   helm upgrade frontend podinfo/podinfo -n sre-lab -f podinfo-frontend-ha.yaml
+# worker가 2대일 때 Pod가 서로 다른 노드에 퍼진다. 차트가 두 값을 모두 지원한다(values.yaml 확인).
+replicaCount: 2
+
+backend: http://backend-podinfo.sre-lab:9898/echo
+
+service:
+  type: NodePort
+  nodePort: 30980
+
+serviceMonitor:
+  enabled: true
+  interval: 15s
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 32Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+
+# 노드(hostname)마다 Pod를 고르게 분산. 노드가 1대뿐이면 whenUnsatisfiable: ScheduleAnyway가 있어 배치는 가능하다
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: ScheduleAnyway
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/name: frontend-podinfo
+
+# 자발적 중단(노드 drain 등) 중에도 최소 1개는 유지. replicaCount가 2 이상일 때만 생성된다
+podDisruptionBudget:
+  minAvailable: 1

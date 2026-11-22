@@ -1,0 +1,39 @@
+# ~/.codex/rules/default.rules 로 복사한 뒤 Codex를 다시 시작한다. 언어는 Starlark(파이썬과 비슷한 문법).
+# decision: allow = 샌드박스 밖에서 묻지 않고 실행 / prompt = 매번 확인 / forbidden = 차단.
+# 여러 규칙이 맞으면 가장 엄격한 결정이 적용된다(forbidden > prompt > allow).
+# 출처: https://learn.chatgpt.com/docs/agent-configuration/rules (2026-11-22 확인, 문서에 experimental 표기)
+# 검증: codex execpolicy check --pretty --rules ~/.codex/rules/default.rules -- kubectl get pods -n sre-lab
+
+prefix_rule(
+    pattern = ["kubectl", ["get", "describe", "logs"]],
+    decision = "allow",
+    justification = "읽기 조회는 허용",
+    match = ["kubectl get pods -n sre-lab", "kubectl logs deploy/frontend-podinfo -n sre-lab"],
+    not_match = ["kubectl delete pod x"],
+)
+
+prefix_rule(
+    pattern = ["kubectl", "rollout", ["status", "history"]],
+    decision = "allow",
+    justification = "롤아웃 조회는 허용",
+)
+
+prefix_rule(
+    pattern = ["kubectl", "rollout", "undo"],
+    decision = "prompt",
+    justification = "롤백은 사람이 확인",
+)
+
+prefix_rule(
+    pattern = ["kubectl", ["delete", "apply", "edit", "exec", "patch", "scale", "config"]],
+    decision = "forbidden",
+    justification = "변경 명령은 사람이 직접 실행한다",
+    match = ["kubectl delete pod x", "kubectl apply -f a.yaml"],
+)
+
+prefix_rule(
+    pattern = ["kubectl", "get", ["secret", "secrets"]],
+    decision = "forbidden",
+    justification = "Secret 조회 금지",
+    match = ["kubectl get secret -n sre-lab"],
+)

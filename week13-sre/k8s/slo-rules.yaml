@@ -1,0 +1,60 @@
+# 실측 전
+# frontend SLO 규칙. 적용: kubectl apply -f slo-rules.yaml
+# SLO: 가용성 99% (30일), 에러버짓 1%. 지표 이름은 podinfo 소스(pkg/api/http/metrics.go) 기준:
+#   http_requests_total{status}, http_request_duration_seconds_bucket{method,path,status}
+# 성공 = status가 5xx가 아닌 요청. Pod 상태 확인용 probe는 exec 방식이라 이 지표에 섞이지 않는다.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: podinfo-slo
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/part-of: sre-lab
+spec:
+  groups:
+    # 기록 규칙: 자주 쓰는 SLI 식을 미리 계산해 둔다
+    - name: podinfo-sli
+      interval: 30s
+      rules:
+        - record: sre:http_requests:rate5m
+          expr: sum(rate(http_requests_total{namespace="sre-lab", job="frontend-podinfo"}[5m]))
+        - record: sre:http_errors:rate5m
+          expr: sum(rate(http_requests_total{namespace="sre-lab", job="frontend-podinfo", status=~"5.."}[5m])) or vector(0)
+        - record: sre:sli_availability:ratio_rate5m
+          expr: |
+            1 - (
+              (sum(rate(http_requests_total{namespace="sre-lab", job="frontend-podinfo", status=~"5.."}[5m])) or vector(0))
+              /
+              sum(rate(http_requests_total{namespace="sre-lab", job="frontend-podinfo"}[5m]))
+            )
+        - record: sre:sli_availability:ratio_rate15m
+          expr: |
+            1 - (
+              (sum(rate(http_requests_total{namespace="sre-lab", job="frontend-podinfo", status=~"5.."}[15m])) or vector(0))
+              /
+              sum(rate(http_requests_total{namespace="sre-lab", job="frontend-podinfo"}[15m]))
+            )
+        - record: sre:sli_latency_p95:seconds_rate5m
+          expr: |
+            histogram_quantile(0.95,
+              sum by (le) (rate(http_request_duration_seconds_bucket{namespace="sre-lab", job="frontend-podinfo"}[5m])))
+
+    # 알림 규칙: 증상(사용자가 겪는 실패)을 기준으로 한다
+    - name: podinfo-slo-alerts
+      rules:
+        # 번레이트 14.4배 = 30일 버짓의 2%를 1시간에 소진하는 속도.
+        # 긴 창과 짧은 창을 모두 만족해야 울린다(오탐 감소와 빠른 해소).
+        # 실무 표준은 1시간과 5분 창이지만, 실습은 시간이 짧아 15분과 5분으로 줄였다.
+        # 에러율 > 14.4 x (1 - 0.99) = 14.4%
+        - alert: PodinfoAvailabilityBurnRateHigh
+          expr: |
+            (1 - sre:sli_availability:ratio_rate15m) > (14.4 * 0.01)
+            and
+            (1 - sre:sli_availability:ratio_rate5m) > (14.4 * 0.01)
+          for: 1m
+          labels:
+            severity: page
+            slo: availability
+          annotations:
+            summary: "frontend 가용성 SLO(99%) 에러버짓을 빠르게 소진 중"
+            description: "15분 에러율 {{ $value | humanizePercentage }}. 15분과 5분 창 모두 번레이트 14.4배를 넘었다. 요청이 없으면 이 알림은 울리지 않는다(부하 필요)."
